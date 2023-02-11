@@ -1,48 +1,69 @@
 from django.shortcuts import render
+from django.http import HttpResponse
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Dish
-from .serializers import DishSerializer
+
 from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 import json
 # Create your views here.
 
-class DishViewSet(viewsets.ModelViewSet):
-    queryset = Dish.objects.all()
-    serializer_class = DishSerializer
 
-    @action(detail=False, methods=['post'])
-    def register(self, request):
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(restaurant=request.user.restaurant)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 def obtenerPlatos(request):
     if request.method == "GET":
         categoria = request.GET.get("categoria")
-        restaurante = request.GET.get("restaurante")
 
-        if categoria == None or restaurante == None:
+        if categoria == None:
             dictError = {
-                "error": "Debe enviar una categoria y restaurante como query parameters."
+                "error": "Debe enviar una categoria como query paremeter."
             }
-            return JsonResponse(dictError)
+            strError = json.dumps(dictError)
+            return HttpResponse(strError)
 
-        platos = Dish.objects.filter(category=categoria, restaurant=restaurante)
+        peliculas = [
+            {
+                "id": 1,
+                "nombre": "Avatar 2",
+                "url": "https://i.blogs.es/6b43d1/avatar-edicion-especial-cartel/450_1000.jpg",
+                "categoria": 1
+            }, {
+                "id": 2,
+                "nombre": "El gato con botas",
+                "url": "https://www.universalpictures-latam.com/tl_files/content/movies/puss_in_boots_2/posters/01.jpg",
+                "categoria": 2
+            }, {
+                "id": 3,
+                "nombre": "Transformer, el despertar de las bestias",
+                "url": "https://es.web.img3.acsta.net/pictures/22/12/02/09/33/5399733.jpg",
+                "categoria": 3
+            }
+        ]
 
+        peliculasFiltradas = []
+        if categoria == "-1":
+            # No se debe filtrar nana
+            peliculasFiltradas = peliculas
+        else :
+            for p in peliculas:
+                if p["categoria"] == int(categoria):
+                    peliculasFiltradas.append(p)
+        
+        # TODO: Consultas a bd
         dictResponse = {
             "error": "",
-            "platos": list(platos)
+            "peliculas": list(peliculasFiltradas)
         }
-        return JsonResponse(dictResponse)
+        strResponse = json.dumps(dictResponse)
+        return HttpResponse(strResponse)
     else:
         dictError = {
-            "error": "Tipo de petición no existe"
+            "error": "Tipo de peticion no existe"
         }
-        return JsonResponse(dictError)
+        strError = json.dumps(dictError)
+        return HttpResponse(strError)
+
