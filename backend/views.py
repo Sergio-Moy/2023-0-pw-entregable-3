@@ -8,6 +8,7 @@ from .models import Dish
 from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 import json
+from . models import Categorias
 # Create your views here.
 
 
@@ -198,6 +199,46 @@ def obtenerPlatos_10(request):
         }
         strResponse = json.dumps(dictResponse)
         return HttpResponse(strResponse)
+    else:
+        dictError = {
+            "error": "Tipo de peticion no existe"
+        }
+        strError = json.dumps(dictError)
+        return HttpResponse(strError)
+
+
+def ObtenerCategorias_10(request):
+    if request.method=="GET":
+        #Lista en formato QuerySet
+        #Filtrar categorias cuyo estado sea A de Activo
+        ListaCategoriasQuerySet = Categorias.objects.filter(estado=1)
+        #Restaurante
+        restaurante = request.GET.get("restaurante")
+    #ListaCategorias = list(ListaCategoriasQuerySet)#convertido a lista de python (NO FUNCIONA)
+        #En su reemplazo hacemos esto:
+        ListaCategorias = []
+        if restaurante=="-1":
+         for c in ListaCategoriasQuerySet:
+            ListaCategorias.append({
+                "id":c.id,
+                "nombre":c.name,
+                "restaurante":c.restaurantes
+            })#convertido a lista de python
+        else:
+            ListaCategoriasQuerySet = Categorias.objects.filter(restaurantes=int(restaurante))
+            for c in ListaCategoriasQuerySet:
+                ListaCategorias.append({
+                      "id":c.id,
+                      "nombre":c.name,
+                      "restaurante":c.restaurantes
+                })#convertido a lista de python
+
+        dictOK = {
+            "error" : "",
+            "categoria" : ListaCategorias
+        }
+        #Para retornarlo en el frondend, tengo que convertirlo a un String JSON y no dicc
+        return HttpResponse(json.dumps(dictOK))
     else:
         dictError = {
             "error": "Tipo de peticion no existe"

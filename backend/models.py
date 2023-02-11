@@ -14,3 +14,20 @@ class Restaurant(models.Model):
     
     def __str__(self):
         return self.name
+
+class Categorias(models.Model):
+    RESTAURANTES_CATEGORIA = (
+        (1,"Sabor y punto"),
+        (2,"Corralito"),
+        (3,"Sabores y mixturas")
+    )
+    ESTADO_CATEGORIA = (
+        (1,"Activo"),
+        (2,"Inactivo")
+    )
+
+    name = models.CharField(max_length=255)
+    estado = models.IntegerField(max_length=1, choices=ESTADO_CATEGORIA)
+    restaurantes = models.IntegerField(max_length=1, choices=RESTAURANTES_CATEGORIA)
+    def __str__(self):
+        return self.name
