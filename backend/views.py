@@ -1,6 +1,9 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from .models import Restaurant
 from .models import Dish
 
 from django.core import serializers
@@ -64,3 +67,20 @@ def obtenerPlatos(request):
         strError = json.dumps(dictError)
         return HttpResponse(strError)
 
+def restaurant_login(request):
+    if request.method == "POST":
+        email = request.POST.get("email")
+        password = request.POST.get("password")
+        
+        restaurant = authenticate(email=email, password=password)
+        if restaurant is not None:
+            login(request, restaurant)
+            return redirect("home")
+        else:
+            return render(request, "login.html", {"error_message": "Invalid login"})
+    else:
+        return render(request, "login.html")
+
+@login_required(login_url="login")
+def home(request):
+    return render(request, "home.html")
