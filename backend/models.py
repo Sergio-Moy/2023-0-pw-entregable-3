@@ -16,11 +16,13 @@ class Restaurant(models.Model):
         return self.name
 
 class Categorias(models.Model):
+    
     RESTAURANTES_CATEGORIA = (
         (1,"Sabor y punto"),
         (2,"Corralito"),
         (3,"Sabores y mixturas")
     )
+
     ESTADO_CATEGORIA = (
         (1,"Activo"),
         (2,"Inactivo")
@@ -31,3 +33,26 @@ class Categorias(models.Model):
     restaurantes = models.IntegerField(max_length=1, choices=RESTAURANTES_CATEGORIA)
     def __str__(self):
         return self.name
+
+class Pedidos(models.Model):
+    
+    RESTAURANTES_PEDIDOS = (
+        (1,"Sabor y punto"),
+        (2,"Corralito"),
+        (3,"Sabores y mixturas")
+    )
+
+    ESTADO_PEDIDOS = (
+        (1,"Preparado"),
+        (2,"Transportado"),
+        (3,"Entregado")
+    )
+
+    producto = models.CharField(max_length=255)
+    codigo = models.IntegerField(max_length=255)
+    precio = models.IntegerField(max_length=255)
+    cantidad = models.IntegerField(max_length=255)
+    estado = models.IntegerField(max_length=1, choices=ESTADO_PEDIDOS)
+    restaurantes = models.IntegerField(max_length=1, choices=RESTAURANTES_PEDIDOS)
+    def __str__(self):
+        return self.producto

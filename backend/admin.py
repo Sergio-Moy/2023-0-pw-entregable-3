@@ -4,3 +4,4 @@ from . import models
 admin.site.register(models.Dish)
 admin.site.register(models.Restaurant)
 admin.site.register(models.Categorias)
+admin.site.register(models.Pedidos)
