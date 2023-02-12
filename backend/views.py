@@ -11,7 +11,7 @@ from django.views.decorators.http import require_POST
 import json
 from . models import Categorias
 from django.http import JsonResponse
-from .models import Restaurant
+from .models import Restaurante
 from . models import Pedidos
 from .models import clienteulima
 from .models import ofertas
@@ -224,12 +224,12 @@ def obtenerPlatos_10(request):
         strError = json.dumps(dictError)
         return HttpResponse(strError)
 
-
+@csrf_exempt
 def ObtenerCategorias_10(request):
     if request.method=="GET":
         #Lista en formato QuerySet
         #Filtrar categorias cuyo estado sea A de Activo
-        ListaCategoriasQuerySet = Categorias.objects.filter(estado=1)
+        ListaCategoriasQuerySet = PlatoRegistrado.objects.all()
         #Restaurante
         restaurante = request.GET.get("restaurante")
     #ListaCategorias = list(ListaCategoriasQuerySet)#convertido a lista de python (NO FUNCIONA)
@@ -238,17 +238,15 @@ def ObtenerCategorias_10(request):
         if restaurante=="-1":
          for c in ListaCategoriasQuerySet:
             ListaCategorias.append({
-                "id":c.id,
-                "nombre":c.name,
-                "restaurante":c.restaurantes
+                "restaurante":c.restaurante,
+                "categoría":c.categoría
             })#convertido a lista de python
         else:
-            ListaCategoriasQuerySet = Categorias.objects.filter(restaurantes=int(restaurante))
+            ListaCategoriasQuerySet = PlatoRegistrado.objects.filter(restaurante=restaurante)
             for c in ListaCategoriasQuerySet:
                 ListaCategorias.append({
-                      "id":c.id,
-                      "nombre":c.name,
-                      "restaurante":c.restaurantes
+                      "restaurante":c.restaurante,
+                      "categoría":c.categoría
                 })#convertido a lista de python
 
         dictOK = {
@@ -263,36 +261,40 @@ def ObtenerCategorias_10(request):
         }
         strError = json.dumps(dictError)
         return HttpResponse(strError)
-
+@csrf_exempt
 def ObtenerPedidos_8(request):
     if request.method=="GET":
         #Lista en formato QuerySet
         #all() = saca todo el contenido
-        ListaPedidosQuerySet = Pedidos.objects.all()
+        ListaPedidosQuerySet = PlatoRegistrado.objects.all()
         codigo = request.GET.get("codigo")
         ListaPedidos = []
         if codigo=="-1":
           for c in ListaPedidosQuerySet:
             ListaPedidos.append({
-                "id":c.id,
-                "producto":c.producto,
-                "codigo":c.codigo,
-                "precio":str(c.precio),
-                "cantidad":c.cantidad,
-                "estado":c.estado,
-                "restaurante": c.restaurantes
+                      "id":c.id,
+                      "producto":c.producto,
+                      "codigo":c.codigo_verificación,
+                      "precio":str(c.precio),
+                      "cantidad":c.cantidad,
+                      "estado":c.categoría,
+                      "restaurante": c.restaurante,
+                      "cliente": c.cliente,
+                      "estado":c.estado
             })
         else:
-            ListaPedidosQuerySet = Pedidos.objects.filter(codigo=int(codigo))
+            ListaPedidosQuerySet = PlatoRegistrado.objects.filter(codigo_verificación=int(codigo))
             for c in ListaPedidosQuerySet:
                 ListaPedidos.append({
                       "id":c.id,
                       "producto":c.producto,
-                      "codigo":c.codigo,
+                      "codigo":c.codigo_verificación,
                       "precio":str(c.precio),
                       "cantidad":c.cantidad,
-                      "estado":c.estado,
-                      "restaurante": c.restaurantes
+                      "estado":c.categoría,
+                      "restaurante": c.restaurante,
+                      "cliente": c.cliente,
+                      "estado":c.estado
                 })
 
         dictOK = {
@@ -390,27 +392,29 @@ def loginCliente(request):
         }
         strError = json.dumps(dictError)
         return HttpResponse(strError)
-
+@csrf_exempt
 def ObtenerPedido_Estado_14(request):
     if request.method=="GET":
-        ListaPedidosQuerySet = Pedidos.objects.all()
+        ListaPedidosQuerySet = PlatoRegistrado.objects.all()
         estado = request.GET.get("estado")
         codigo = request.GET.get("codigo")
         ListaPedidos = []
 
         for c in ListaPedidosQuerySet:
-            if int(codigo )== c.codigo:
-                c.estado = int(estado)
+            if int(codigo )== c.codigo_verificación:
+                c.codigo_verificación = int(estado)
 
         for c in ListaPedidosQuerySet:
             ListaPedidos.append({
-                "id":c.id,
-                "producto":c.producto,
-                "codigo":c.codigo,
-                "precio":str(c.precio),
-                "cantidad":c.cantidad,
-                "estado":c.estado,
-                "restaurante": c.restaurantes
+                      "id":c.id,
+                      "producto":c.producto,
+                      "codigo":c.codigo_verificación,
+                      "precio":str(c.precio),
+                      "cantidad":c.cantidad,
+                      "estado":c.categoría,
+                      "restaurante": c.restaurante,
+                      "cliente": c.cliente,
+                      "estado":c.estado
             })
 
         dictOK = {
@@ -424,7 +428,7 @@ def ObtenerPedido_Estado_14(request):
         }
         strError = json.dumps(dictError)
         return HttpResponse(strError)
-
+@csrf_exempt
 def ObtenerPedido_Registrar_7(request):
     #http://localhost:8000/backend/ObtenerPedido_Registrar_7/listar?codigo=30&direccion=Distrito%2013%20%20jr%20Bolivar
     #Nota: el espacio se hace con %20
@@ -436,13 +440,15 @@ def ObtenerPedido_Registrar_7(request):
 
         for c in ListaPedidosQuerySet:
             ListaPedidos.append({
-                "id":c.id,
-                "producto":c.producto,
-                "codigo":c.codigo,
-                "precio":str(c.precio),
-                "cantidad":c.cantidad,
-                "estado":c.estado,
-                "restaurante": c.restaurantes
+                      "id":c.id,
+                      "producto":c.producto,
+                      "codigo":c.codigo_verificación,
+                      "precio":str(c.precio),
+                      "cantidad":c.cantidad,
+                      "estado":c.categoría,
+                      "restaurante": c.restaurante,
+                      "cliente": c.cliente,
+                      "estado":c.estado
             })
         ListaPedidos.append({
             "codigo":codigo,

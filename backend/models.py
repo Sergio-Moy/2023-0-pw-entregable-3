@@ -46,28 +46,6 @@ class Categorias(models.Model):
     def __str__(self):
         return self.name
 
-class Pedidos(models.Model):
-    
-    RESTAURANTES_PEDIDOS = (
-        (1,"Sabor y punto"),
-        (2,"Corralito"),
-        (3,"Sabores y mixturas")
-    )
-
-    ESTADO_PEDIDOS = (
-        (1,"Preparado"),
-        (2,"Transportado"),
-        (3,"Entregado")
-    )
-
-    producto = models.CharField(max_length=255)
-    codigo = models.IntegerField(max_length=255)
-    precio = models.DecimalField(max_digits=5, decimal_places=2)
-    cantidad = models.IntegerField(max_length=255)
-    estado = models.IntegerField(max_length=1, choices=ESTADO_PEDIDOS)
-    restaurantes = models.IntegerField(max_length=1, choices=RESTAURANTES_PEDIDOS)
-    def __str__(self):
-        return self.producto
 
 class Plato(models.Model):
     nombre = models.CharField(max_length=100)
@@ -161,3 +139,23 @@ class PlatoRegistrado(models.Model):
             ('2', 'No')
         )
     )
+    def __str__(self):
+        return self.producto
+        
+class Pedidos(models.Model):
+
+    producto = models.CharField(max_length=255)
+    codigo = models.IntegerField(max_length=255)
+    precio = models.DecimalField(max_digits=5, decimal_places=2)
+    cantidad = models.IntegerField(max_length=255)
+    estado = models.CharField(
+        max_length=20,
+        choices=(
+            ('1', 'Confirmado'),
+            ('2', 'En preparación'),
+            ('3', 'Entregado')
+        )
+    )
+    restaurantes = models.ForeignKey(Restaurante, on_delete=models.CASCADE)
+    def __str__(self):
+        return self.producto
