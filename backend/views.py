@@ -12,6 +12,7 @@ import json
 from . models import Categorias
 from django.http import JsonResponse
 from .models import Restaurant
+from . models import Pedidos
 # Create your views here.
 
 @csrf_exempt
@@ -224,6 +225,47 @@ def ObtenerCategorias_10(request):
             "categoria" : ListaCategorias
         }
         #Para retornarlo en el frondend, tengo que convertirlo a un String JSON y no dicc
+        return HttpResponse(json.dumps(dictOK))
+    else:
+        dictError = {
+            "error": "Tipo de peticion no existe"
+        }
+        strError = json.dumps(dictError)
+        return HttpResponse(strError)
+
+def ObtenerPedidos_8(request):
+    if request.method=="GET":
+        #Lista en formato QuerySet
+        #all() = saca todo el contenido
+        ListaPedidosQuerySet = Pedidos.objects.all()
+        codigo = request.GET.get("codigo")
+        ListaPedidos = []
+        if codigo=="-1":
+          for c in ListaPedidosQuerySet:
+            ListaPedidos.append({
+                "id":c.id,
+                "producto":c.producto,
+                "codigo":c.codigo,
+                "precio":c.precio,
+                "cantidad":c.cantidad,
+                "restaurante": c.restaurantes
+            })
+        else:
+            ListaPedidosQuerySet = Pedidos.objects.filter(codigo=int(codigo))
+            for c in ListaPedidosQuerySet:
+                ListaPedidos.append({
+                      "id":c.id,
+                      "producto":c.producto,
+                      "codigo":c.codigo,
+                      "precio":c.precio,
+                      "cantidad":c.cantidad,
+                      "restaurante": c.restaurantes
+                })
+
+        dictOK = {
+            "error" : "",
+            "Pedidos" : ListaPedidos
+        }
         return HttpResponse(json.dumps(dictOK))
     else:
         dictError = {
