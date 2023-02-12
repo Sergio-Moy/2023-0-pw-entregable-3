@@ -246,7 +246,7 @@ def ObtenerPedidos_8(request):
                 "id":c.id,
                 "producto":c.producto,
                 "codigo":c.codigo,
-                "precio":c.precio,
+                "precio":str(c.precio),
                 "cantidad":c.cantidad,
                 "restaurante": c.restaurantes
             })
@@ -257,7 +257,7 @@ def ObtenerPedidos_8(request):
                       "id":c.id,
                       "producto":c.producto,
                       "codigo":c.codigo,
-                      "precio":c.precio,
+                      "precio":str(c.precio),
                       "cantidad":c.cantidad,
                       "restaurante": c.restaurantes
                 })

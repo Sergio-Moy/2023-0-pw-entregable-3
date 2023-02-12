@@ -52,7 +52,7 @@ class Pedidos(models.Model):
 
     producto = models.CharField(max_length=255)
     codigo = models.IntegerField(max_length=255)
-    precio = models.IntegerField(max_length=255)
+    precio = models.DecimalField(max_digits=5, decimal_places=2)
     cantidad = models.IntegerField(max_length=255)
     estado = models.IntegerField(max_length=1, choices=ESTADO_PEDIDOS)
     restaurantes = models.IntegerField(max_length=1, choices=RESTAURANTES_PEDIDOS)
