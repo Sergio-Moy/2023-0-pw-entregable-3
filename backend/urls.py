@@ -10,5 +10,6 @@ urlpatterns=[
     path("recomendaciones", views.ObtenerRecomendaciones),
     path("Cliente", views.loginCliente),
     path("ofertas", views.obtener_ofertas),
-    path("ObtenerPedido_Estado_14/listar", views.ObtenerPedido_Estado_14)
+    path("ObtenerPedido_Estado_14/listar", views.ObtenerPedido_Estado_14),
+    path("ObtenerPedido_Registrar_7/listar",views.ObtenerPedido_Registrar_7)
 ]

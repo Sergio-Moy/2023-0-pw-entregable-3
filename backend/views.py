@@ -276,6 +276,7 @@ def ObtenerPedidos_8(request):
                 "codigo":c.codigo,
                 "precio":str(c.precio),
                 "cantidad":c.cantidad,
+                "estado":c.estado,
                 "restaurante": c.restaurantes
             })
         else:
@@ -287,6 +288,7 @@ def ObtenerPedidos_8(request):
                       "codigo":c.codigo,
                       "precio":str(c.precio),
                       "cantidad":c.cantidad,
+                      "estado":c.estado,
                       "restaurante": c.restaurantes
                 })
 
@@ -369,7 +371,7 @@ def loginCliente(request):
                 "error": "",
                 "Cliente": {
                     "codigo": Cliente.codigo,
-                    "nombre": CLiente.nombre,
+                    "nombre": Cliente.nombre,
                     "apellido" :Cliente.apellido,
                     "carrera" : Cliente.carrera
                 }
@@ -405,10 +407,46 @@ def ObtenerPedido_Estado_14(request):
                 "producto":c.producto,
                 "codigo":c.codigo,
                 "precio":str(c.precio),
-                "estado":c.estado,
                 "cantidad":c.cantidad,
+                "estado":c.estado,
                 "restaurante": c.restaurantes
             })
+
+        dictOK = {
+            "error" : "",
+            "Pedidos" : ListaPedidos
+        }
+        return HttpResponse(json.dumps(dictOK))
+    else:
+        dictError = {
+            "error" : "Tipo de petición incorrecto, usar GET"
+        }
+        strError = json.dumps(dictError)
+        return HttpResponse(strError)
+
+def ObtenerPedido_Registrar_7(request):
+    #http://localhost:8000/backend/ObtenerPedido_Registrar_7/listar?codigo=30&direccion=Distrito%2013%20%20jr%20Bolivar
+    #Nota: el espacio se hace con %20
+    if request.method=="GET":
+        ListaPedidosQuerySet = Pedidos.objects.all()
+        codigo = request.GET.get("codigo")
+        direccion = request.GET.get("direccion")
+        ListaPedidos = []
+
+        for c in ListaPedidosQuerySet:
+            ListaPedidos.append({
+                "id":c.id,
+                "producto":c.producto,
+                "codigo":c.codigo,
+                "precio":str(c.precio),
+                "cantidad":c.cantidad,
+                "estado":c.estado,
+                "restaurante": c.restaurantes
+            })
+        ListaPedidos.append({
+            "codigo":codigo,
+            "direccion": direccion
+        })
 
         dictOK = {
             "error" : "",
