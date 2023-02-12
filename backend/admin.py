@@ -1,10 +1,10 @@
 from django.contrib import admin
 from . import models
 # Register your models here.
-admin.site.register(models.Dish)
-admin.site.register(models.Restaurant)
-admin.site.register(models.Categorias)
-admin.site.register(models.Pedidos)
-admin.site.register(models.Plato)
-admin.site.register(models.Cliente)
-admin.site.register(models.ofertas)
+admin.site.register(models.CategoriaPlato)
+admin.site.register(models.CategoriaRestaurante)
+admin.site.register(models.Restaurante)
+admin.site.register(models.Oferta)
+admin.site.register(models.MostrarPlato)
+admin.site.register(models.clienteulima)
+admin.site.register(models.PlatoRegistrado)
