@@ -16,6 +16,7 @@ from . models import Pedidos
 from .models import clienteulima
 from .models import ofertas
 from .models import Plato
+from .models import PlatoRegistrado
 
 # Create your views here.
 
@@ -482,3 +483,9 @@ def register_plato(request):
         return redirect('plato_details', plato_id=plato.id)
 
     return render(request, 'register_plato.html')
+
+@csrf_exempt
+def show_orders(request, restaurant_id):
+    restaurant = Restaurant.objects.get(id=restaurant_id)
+    orders = PlatoRegistrado.objects.filter(restaurant=restaurant)
+    return render(request, 'orders.html', {'orders': orders})
