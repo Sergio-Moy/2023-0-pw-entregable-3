@@ -13,6 +13,8 @@ from . models import Categorias
 from django.http import JsonResponse
 from .models import Restaurant
 from . models import Pedidos
+from .models import Cliente
+from .models import ofertas
 # Create your views here.
 
 @csrf_exempt
@@ -32,6 +34,32 @@ def obtener_restaurantes(request):
         dictOK = {
             "error" : "",
             "categorias" : listaCategorias
+        }
+        return HttpResponse(json.dumps(dictOK))
+
+    else:
+        dictError = {
+            "error": "Tipo de peticion no existe"
+        }
+        strError = json.dumps(dictError)
+        return HttpResponse(strError)
+
+@csrf_exempt
+def obtener_ofertas(request):
+    if request.method == "GET":
+        verofertasQuerySet = ofertas.objects.all()
+        listadeofertas = []
+        for v in verofertasQuerySet:
+            listadeofertas.append({
+                "nombre" : v.name,
+                "codigo" : v.codigo,
+                "precio":v.password,
+                "restaurante":v.restaurante,
+            })
+
+        dictOK = {
+            "error" : "",
+            "ofertas" : listadeofertas
         }
         return HttpResponse(json.dumps(dictOK))
 
@@ -327,3 +355,36 @@ def ObtenerRecomendaciones(request):
     }
     strResponse = json.dumps(dictResponse)
     return HttpResponse(strResponse)
+
+@csrf_exempt
+def loginCliente(request):
+    if request.method == "POST":
+        dictDataRequest = json.loads(request.body)
+        usuario = dictDataRequest["Codigo"]
+        password = dictDataRequest["password"]
+
+        Cliente = Cliente.objects.filter(codigo =usuario, password=password).first()
+        if Cliente:
+            dictOK = {
+                "error": "",
+                "Cliente": {
+                    "codigo": Cliente.codigo,
+                    "nombre": CLiente.nombre,
+                    "apellido" :Cliente.apellido,
+                    "carrera" : Cliente.carrera
+                }
+            }
+            return HttpResponse(json.dumps(dictOK))
+        else:
+            dictError = {
+                "error": "Credenciales incorrectas"
+            }
+            strError = json.dumps(usuario)
+            return HttpResponse(strError)
+    else:
+        dictError = {
+            "error": "Tipo de petición no existe"
+        }
+        strError = json.dumps(dictError)
+        return HttpResponse(strError)
+

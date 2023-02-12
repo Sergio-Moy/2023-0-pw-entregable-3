@@ -6,6 +6,16 @@ class Dish(models.Model):
     description = models.TextField()
     price = models.DecimalField(max_digits=5, decimal_places=2)
     restaurant = models.CharField(max_length=30)
+    
+class Cliente(models.Model):
+    codigo = models.CharField(max_length=8)
+    password= models.CharField(max_length=50)
+    nombre = models.CharField(max_length=40)
+    apellido = models.CharField(max_length=50)
+    carrera = models.CharField(max_length=50)
+    
+    def __str__(self):
+        return self.codigo
 
 class Restaurant(models.Model):
     name = models.CharField(max_length=255)
@@ -64,3 +74,16 @@ class Plato(models.Model):
     descripcion = models.TextField()
     precio = models.FloatField()
     restaurante = models.ForeignKey(Restaurant,blank=True, on_delete=models.CASCADE)
+
+    
+class ofertas(models.Model):
+    codigo = models.CharField(max_length=8)
+    nombre = models.CharField(max_length=40)
+    precio = models.IntegerField()
+    restaurante = models.ForeignKey(Restaurant,blank=True, on_delete=models.CASCADE)
+    descripcion = models.CharField(max_length=500)
+    
+    def __str__(self):
+        return self.codigo
+    
+
