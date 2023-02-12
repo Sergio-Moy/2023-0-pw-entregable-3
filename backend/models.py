@@ -72,7 +72,7 @@ class Pedidos(models.Model):
 class Plato(models.Model):
     nombre = models.CharField(max_length=100)
     descripcion = models.TextField()
-    precio = models.FloatField()
+    precio = models.DecimalField(max_digits=5, decimal_places=2)
     restaurante = models.ForeignKey(Restaurant,blank=True, on_delete=models.CASCADE)
 
     
@@ -94,13 +94,7 @@ class CategoriaPlato(models.Model):
         return self.nombre
 
 class CategoriaRestaurante(models.Model):
-    categoría = models.CharField(max_length=255, choices=(
-        ('1', 'Cafeterías'),
-        ('2', 'Foodtrucks'),
-        ('3', 'Platos'),
-        ('4', 'Snacks'),
-        ('5', 'Tiendas'),
-    ))
+    categoría = models.CharField(max_length=255)
 
     def __str__(self):
         return self.categoría
@@ -147,7 +141,7 @@ class clienteulima(models.Model):
 class PlatoRegistrado(models.Model):
     producto = models.CharField(max_length=100)
     cantidad = models.PositiveSmallIntegerField()
-    precio = models.PositiveSmallIntegerField()
+    precio = models.FloatField()
     categoría = models.ForeignKey(CategoriaPlato, on_delete=models.CASCADE)
     restaurante = models.ForeignKey(Restaurante, on_delete=models.CASCADE)
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
