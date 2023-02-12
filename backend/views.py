@@ -388,3 +388,36 @@ def loginCliente(request):
         strError = json.dumps(dictError)
         return HttpResponse(strError)
 
+def ObtenerPedido_Estado_14(request):
+    if request.method=="GET":
+        ListaPedidosQuerySet = Pedidos.objects.all()
+        estado = request.GET.get("estado")
+        codigo = request.GET.get("codigo")
+        ListaPedidos = []
+
+        for c in ListaPedidosQuerySet:
+            if int(codigo )== c.codigo:
+                c.estado = int(estado)
+
+        for c in ListaPedidosQuerySet:
+            ListaPedidos.append({
+                "id":c.id,
+                "producto":c.producto,
+                "codigo":c.codigo,
+                "precio":str(c.precio),
+                "estado":c.estado,
+                "cantidad":c.cantidad,
+                "restaurante": c.restaurantes
+            })
+
+        dictOK = {
+            "error" : "",
+            "Pedidos" : ListaPedidos
+        }
+        return HttpResponse(json.dumps(dictOK))
+    else:
+        dictError = {
+            "error" : "Tipo de petición incorrecto, usar GET"
+        }
+        strError = json.dumps(dictError)
+        return HttpResponse(strError)
