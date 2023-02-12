@@ -58,3 +58,9 @@ class Pedidos(models.Model):
     restaurantes = models.IntegerField(max_length=1, choices=RESTAURANTES_PEDIDOS)
     def __str__(self):
         return self.producto
+
+class Plato(models.Model):
+    nombre = models.CharField(max_length=100)
+    descripcion = models.TextField()
+    precio = models.FloatField()
+    restaurante = models.ForeignKey(Restaurant,blank=True, on_delete=models.CASCADE)
