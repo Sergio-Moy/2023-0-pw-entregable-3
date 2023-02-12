@@ -16,7 +16,8 @@ from . models import Pedidos
 from .models import clienteulima
 from .models import ofertas
 from .models import Plato
-
+from .models import PlatoRegistrado
+from .models import CategoriaPlato
 # Create your views here.
 
 @csrf_exempt
@@ -480,5 +481,24 @@ def register_plato(request):
         )
 
         return redirect('plato_details', plato_id=plato.id)
+
+    return render(request, 'register_plato.html')
+
+@csrf_exempt
+def show_orders(request, restaurant_id):
+    restaurant = Restaurant.objects.get(id=restaurant_id)
+    orders = PlatoRegistrado.objects.filter(restaurant=restaurant)
+    return render(request, 'orders.html', {'orders': orders})
+
+@csrf_exempt
+def register_categoria(request):
+    if request.method == 'POST':
+        categoria = request.POST.get('categoria')
+
+        categoria = CategoriaPlato.objects.create(
+            nombre=categoria
+        )
+
+        return redirect('plato_details', plato_id=categoria.id)
 
     return render(request, 'register_plato.html')
