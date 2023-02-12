@@ -13,8 +13,10 @@ from . models import Categorias
 from django.http import JsonResponse
 from .models import Restaurant
 from . models import Pedidos
-from .models import Cliente
+from .models import clienteulima
 from .models import ofertas
+from .models import Plato
+
 # Create your views here.
 
 @csrf_exempt
@@ -365,15 +367,13 @@ def loginCliente(request):
         usuario = dictDataRequest["Codigo"]
         password = dictDataRequest["password"]
 
-        Cliente = Cliente.objects.filter(codigo =usuario, password=password).first()
+        Cliente = clienteulima.objects.filter(codigo =usuario, password=password).first()
         if Cliente:
             dictOK = {
                 "error": "",
                 "Cliente": {
                     "codigo": Cliente.codigo,
-                    "nombre": Cliente.nombre,
-                    "apellido" :Cliente.apellido,
-                    "carrera" : Cliente.carrera
+                    "nombre": Cliente.nombre
                 }
             }
             return HttpResponse(json.dumps(dictOK))
@@ -459,3 +459,26 @@ def ObtenerPedido_Registrar_7(request):
         }
         strError = json.dumps(dictError)
         return HttpResponse(strError)
+
+@csrf_exempt
+def register_plato(request):
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre')
+        precio = request.POST.get('precio')
+        descripcion = request.POST.get('descripcion')
+        imagen = request.POST.get('imagen')
+        restaurante = request.user.restaurante
+        categoria = request.POST.get('categoria')
+
+        plato = Plato.objects.create(
+            nombre=nombre,
+            precio=precio,
+            descripcion=descripcion,
+            imagen=imagen,
+            restaurante=restaurante,
+            categoria=categoria
+        )
+
+        return redirect('plato_details', plato_id=plato.id)
+
+    return render(request, 'register_plato.html')
