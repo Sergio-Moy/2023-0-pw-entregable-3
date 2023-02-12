@@ -11,9 +11,35 @@ from django.views.decorators.http import require_POST
 import json
 from . models import Categorias
 from django.http import JsonResponse
+from .models import Restaurant
 # Create your views here.
 
+@csrf_exempt
+def obtener_restaurantes(request):
+    if request.method == "GET":
+        listaCategoriasQuerySet = Restaurant.objects.all()
+        listaCategorias = []
+        for c in listaCategoriasQuerySet:
+            listaCategorias.append({
+                "name" : c.name,
+                "email" : c.email,
+                "password":c.password,
+                "address":c.address,
+                "phone":c.phone
+            })
 
+        dictOK = {
+            "error" : "",
+            "categorias" : listaCategorias
+        }
+        return HttpResponse(json.dumps(dictOK))
+
+    else:
+        dictError = {
+            "error": "Tipo de peticion no existe"
+        }
+        strError = json.dumps(dictError)
+        return HttpResponse(strError)
 
 @csrf_exempt
 def loginRestaurante(request):
