@@ -824,21 +824,14 @@ def cambiarEstado(request):
         {"id" : 4, "detalles" : "Cono Vainilla", "status" : 1},
     ]
 
-    if request.method == "POST":
-        req = json.loads(request.body)
-        keys = req.keys()
-        aux = 0
-        for key in keys:
-            if req[key] == 1 and pedidos[aux]["status"] <2:
-                pedidos[aux]["status"] = pedidos[aux]["status"] + 1
-            aux = aux+1
+    if request.method == "GET":
         dictResponse = {
             "error" : "",
             "arreglo" : pedidos
         }
         return HttpResponse(json.dumps(dictResponse))
     else:
-        return HttpResponse("Tipo de petición incorrecto, por favor usar POST")
+        return HttpResponse("Tipo de petición incorrecto, por favor usar GET")
 
 @csrf_exempt
 def registrarentrega(request):
