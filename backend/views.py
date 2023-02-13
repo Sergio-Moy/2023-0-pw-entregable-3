@@ -809,3 +809,27 @@ def register_categoria(request):
         return redirect('plato_details', plato_id=categoria.id)
 
     return render(request, 'register_plato.html')
+
+@csrf_exempt
+def cambiarEstado(request):
+    pedidos = [
+        {"id" : "1", "desc" : "Cheeseburger Regular", "status" : 0},
+        {"id" : "2", "desc" : "Papas Regulares", "status" : 1},
+        {"id" : "3", "desc" : "Bebida Mediana", "status" : 2},
+        {"id" : "4", "desc" : "Cono Vainilla", "status" : 1},
+    ]
+
+    if request.method == "POST":
+        req = json.loads(request.body)
+        keys = req.keys()
+        aux = 0
+        for key in keys:
+            if req[key] == 1 and pedidos[aux]["status"] <3:
+                pedidos[aux]["status"] = pedidos[aux]["status"] + 1
+            aux = aux+1
+        dictResponse = {
+            "arreglo" : pedidos
+        }
+        return HttpResponse(json.dumps(dictResponse))
+    else:
+        return HttpResponse("Tipo de petición incorrecto, por favor usar POST")
