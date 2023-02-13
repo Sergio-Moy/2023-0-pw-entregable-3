@@ -79,14 +79,14 @@ def loginRestaurante(request):
         dictDataRequest = json.loads(request.body)
         usuario = dictDataRequest["email"]
         password = dictDataRequest["password"]
-
-        restaurante = Restaurant.objects.filter(email=usuario, password=password).first()
+        restaurante = Restaurante.objects.filter(email=usuario, password=password).first()
         if restaurante:
             dictOK = {
                 "error": "",
                 "restaurante": {
-                    "id": restaurante.id,
-                    "email": restaurante.email,
+                    "nombre": restaurante.nombre,
+                    "telefono": restaurante.telefono,
+                    "imagen":restaurante.imagen
                 }
             }
             return HttpResponse(json.dumps(dictOK))
