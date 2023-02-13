@@ -828,8 +828,40 @@ def cambiarEstado(request):
                 pedidos[aux]["status"] = pedidos[aux]["status"] + 1
             aux = aux+1
         dictResponse = {
+            "error" : "",
             "arreglo" : pedidos
         }
         return HttpResponse(json.dumps(dictResponse))
+    else:
+        return HttpResponse("Tipo de petición incorrecto, por favor usar POST")
+
+@csrf_exempt
+def registrarentrega(request):
+    pedidos = [
+        {"code" : 123, "desc" : "Cheeseburger, Papas", "code_v" : 321},
+        {"code" : 456, "desc" : "2x Cono Vainilla", "code_v" : 654},
+        {"code" : 789, "desc" : "Cheese Fingers Familiar", "code_v" : 987},
+    ]
+
+    if request.method == "POST":
+        req = json.loads(request.body)
+        code = req["code"]
+        codev = req["code_v"]
+        error = "No se encontró un pedido con ese código"
+        for i in pedidos:
+            if code == i["code"]:
+                if codev == i["code_v"]:
+                    dictOk = {
+                        "error" : "",
+                        "mensaje" : "Código de verificación correcto, entrega registrada"
+                    }
+                    strOk = json.dumps(dictOk)
+                    return HttpResponse(strOk)
+                else:
+                    error = "El código de verificación es incorrecto"
+        dictError = {
+            "error" : error
+        }
+        return HttpResponse(json.dumps(dictError))
     else:
         return HttpResponse("Tipo de petición incorrecto, por favor usar POST")
