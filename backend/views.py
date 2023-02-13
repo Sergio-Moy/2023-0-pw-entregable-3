@@ -818,10 +818,10 @@ def register_categoria(request):
 @csrf_exempt
 def cambiarEstado(request):
     pedidos = [
-        {"id" : "1", "desc" : "Cheeseburger Regular", "status" : 0},
-        {"id" : "2", "desc" : "Papas Regulares", "status" : 1},
-        {"id" : "3", "desc" : "Bebida Mediana", "status" : 2},
-        {"id" : "4", "desc" : "Cono Vainilla", "status" : 1},
+        {"id" : 1, "detalles" : "Cheeseburger Regular", "status" : 0},
+        {"id" : 2, "detalles" : "Papas Regulares", "status" : 1},
+        {"id" : 3, "detalles" : "Bebida Mediana", "status" : 2},
+        {"id" : 4, "detalles" : "Cono Vainilla", "status" : 1},
     ]
 
     if request.method == "POST":
@@ -829,7 +829,7 @@ def cambiarEstado(request):
         keys = req.keys()
         aux = 0
         for key in keys:
-            if req[key] == 1 and pedidos[aux]["status"] <3:
+            if req[key] == 1 and pedidos[aux]["status"] <2:
                 pedidos[aux]["status"] = pedidos[aux]["status"] + 1
             aux = aux+1
         dictResponse = {
