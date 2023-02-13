@@ -301,31 +301,36 @@ def ObtenerCategorias_10(request):
         strResponse = json.dumps(dictResponse)
         return HttpResponse(strResponse)
         """
-        #Lista en formato QuerySet
-        #Filtrar categorias cuyo estado sea A de Activo
-        ListaCategoriasQuerySet = PlatoRegistrado.objects.all()
-        #Restaurante
-        restaurante = request.GET.get("restaurante")
-    #ListaCategorias = list(ListaCategoriasQuerySet)#convertido a lista de python (NO FUNCIONA)
-        #En su reemplazo hacemos esto:
-        ListaCategorias = []
+                        #HOLALAAALA
+        restaurante = request.GET.get("restaurante")        
+        ListaCategoria = PlatoRegistrado.objects.all()
+        ListaFiltrada = []
+        if restaurante == None:
+            dictError = {
+                "error": "Debe enviar una categoria como query paremeter."
+            }
+            strError = json.dumps(dictError)
+            return HttpResponse(strError)
+
         if restaurante=="-1":
-         for c in ListaCategoriasQuerySet:
-            ListaCategorias.append({
-                "restaurante":c.restaurante,
-                "categoría":c.categoría
-            })#convertido a lista de python
-        else:
-            ListaCategoriasQuerySet = PlatoRegistrado.objects.filter(restaurante=restaurante)
-            for c in ListaCategoriasQuerySet:
-                ListaCategorias.append({
-                      "restaurante":c.restaurante,
-                      "categoría":c.categoría
+            for c in ListaCategoria:
+                ListaFiltrada.append({
+                   "id":c.id,
+                   "nombre":c.producto,
+                   "categoría":c.categoría
                 })#convertido a lista de python
+        else:
+            for c in ListaCategoria:
+                if restaurante == c.restaurante:
+                    ListaFiltrada.append({
+                       "id":c.id,
+                       "nombre":c.producto,
+                       "categoría":c.categoría
+                   })#convertido a lista de python
 
         dictOK = {
             "error" : "",
-            "categoria" : ListaCategorias
+            "categoria" : ListaFiltrada
         }
         #Para retornarlo en el frondend, tengo que convertirlo a un String JSON y no dicc
         return HttpResponse(json.dumps(dictOK))
