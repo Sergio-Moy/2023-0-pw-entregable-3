@@ -863,3 +863,94 @@ def registrarentrega(request):
         return HttpResponse(json.dumps(dictError))
     else:
         return HttpResponse("Tipo de petición incorrecto, por favor usar POST")
+    
+        
+@csrf_exempt
+def categoriaplatos(request):
+    if request.method == "GET": 
+        restaurante = request.GET.get("restaurante")
+        categoria = request.GET.get("categoria")
+        if restaurante == None and categoria == None: 
+            dictError = {
+                "error": "Debe enviar una categoria y restaurante como query parameter. "
+            }
+            strError = json.dumps(dictError)
+            return HttpResponse(strError)
+        platos = [
+            {
+               "id": 1,
+                "Restaurante": "bembos",
+                "Categoria": "Bebidas",
+                "Producto" : "Gaseosa Inkacola",
+                "Precio": 18.5
+            },{
+                "id": 2,
+                "Restaurante": "Bembos",
+                "Categoria": "hamburguesas",
+                "Producto" : "Hamburguesa de parrilla",
+                "Precio": 19.5
+            },{
+                "id": 3,
+                "Restaurante": "Bembos",
+                "Categoria": "Complementos",
+                "Producto" : "Porción de papitas grande",
+                "Precio": 9.5
+            },{
+                "id": 4,
+                "Restaurante": "Bembos",
+                "Categoria": "Helados",
+                "Producto" : "Helado de vainilla grande",
+                "Precio": 3.5
+            },{
+                "id": 5,
+                "Restaurante": "Cafeteria O",
+                "Categoria": "Combos",
+                "Producto" : " 6 porciones de pollo + 1 porción de papitas",
+                "Precio": 23.5
+            },{
+                "id": 6,
+                "Restaurante": "Cafeteria O",
+                "Categoria": "Nugets",
+                "Producto" : "24 Nugets + 1 porcíon de papitas grande",
+                "Precio": 20.5
+            },{
+                "id": 7,
+                "Restaurante": "Cafeteria O",
+                "Categoria": "Almuerzos",
+                "Producto" : "Ají de gallina",
+                "Precio": 12.5
+            },{
+                "id": 8,
+                "Restaurante": "Cafeteria O",
+                "Categoria": "Desayuno",
+                "Producto" : "Café + Pan con Pollo",
+                "Precio": 5.5
+            }, {
+                "id": 9,
+                "Restaurante": "Cafeteria O",
+                "Categoria": "Cena",
+                "Producto" : "Salchipapa",
+                "Precio": 12.5
+            }
+        ]
+        categoriaplatos = []
+        #Convertir el tipo String a un int para q se conpare con el otro int=p["categoria"]
+        if restaurante=="-1":
+            #no se va a filtrar
+            categoriaplatos = platos
+        else:
+            for n in platos:
+               if n["Restaurante"] == restaurante:
+                  categoriaplatos.append(n)
+        
+        # TODO: Consultas a base de datos
+        dictResponse = {
+            "error": "",
+            "platos": list(categoriaplatos)
+        }
+        strResponse = json.dumps(dictResponse)
+        return HttpResponse(strResponse)
+        
+
+    
+    

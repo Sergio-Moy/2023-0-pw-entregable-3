@@ -14,4 +14,5 @@ urlpatterns=[
     path("ObtenerPedido_Registrar_7/listar",views.ObtenerPedido_Registrar_7),
     path("cambiarestado", views.cambiarEstado),
     path("registrarentrega", views.registrarentrega),
+    path("categoriaplatos", views.categoriaplatos)
 ]
