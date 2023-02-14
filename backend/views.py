@@ -13,6 +13,7 @@ from .models import clienteulima
 from .models import Oferta
 from .models import PlatoRegistrado
 from .models import CategoriaPlato
+from django.db import models
 # Create your views here.
 
 @csrf_exempt
@@ -104,111 +105,61 @@ def obtenerPlatos_10(request):
         #http://127.0.0.1:8000/backend/platos_10/listar?categoria=-1&restaurante=-1
         categoria = request.GET.get("categoria")
         restaurante = request.GET.get("restaurante")
-        if categoria == None and restaurante == None:
+        if restaurante == None and categoria==None:
             dictError = {
                 "error": "Debe enviar una categoria y restaurante como query paremeter."
             }
             strError = json.dumps(dictError)
             return HttpResponse(strError)
-        platos_10 = [
-            {
-                "id": 1,
-                "Restaurante": 1,
-                "Categoria": 1,
-                "Producto" : "Limonada Frozen (1.5L)",
-                "Precio": 18.5,
-                "Imagen":"https://www.ahorrarnuncafuetanbueno.com.pe/wp-content/uploads/2022/02/Limonada_frozen_912x700.jpg",
-                "Izq": "#3",
-                "Der": "#2"
-            }, {
-                "id": 2,
-                "Restaurante": 1,
-                "Categoria": 1,
-                "Producto" : "Cusqueña (310 ml)",
-                "Precio": 4.5,
-                "Imagen":"https://polleriaslagranja.com/wp-content/uploads/2022/10/La-Granja-Real-Food-Chicken-Cusquena.png",
-                "Izq": "#1",
-                "Der": "#3"
-            }, {
-                "id": 3,
-                "Restaurante": 1,
-                "Categoria": 1,
-                "Producto" : "Inca Cola (1.5L)",
-                "Precio": 6.5,
-                "Imagen":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-73bW05hAU7jQDiqAgHB70rh2TGOYSW8Gvw&usqp=CAU",
-                "Izq": "#2",
-                "Der": "#1"
-            }, {
-                "id" : 4,
-                "Restaurante": 1,
-                "Categoria": 2,
-                "Producto" : "Ceviche Familiar",
-                "Precio": 19.50,
-                "Imagen":"https://micevichedehoy.com/wp-content/uploads/2018/12/ceviche-de-pescado_700x465-700x465.jpg",
-                "Izq": "#6",
-                "Der": "#5"
-            }, {
-                "id" : 5,
-                "Restaurante": 1,
-                "Categoria": 2,
-                "Producto" : "Sopa de cangrejo",
-                "Precio": 16.00,
-                "Imagen":"https://recetas.7maravillasgastronomicas.com/wp-content/uploads/2011/01/concentradodecangrejo.jpg",
-                "Izq": "#4",
-                "Der": "#6"
-            }, {
-                "id" : 6,
-                "Restaurante": 1,
-                "Categoria": 2,
-                "Producto" : "Pescado con lenteja (Yuca y ensalada)",
-                "Precio": 22.50,
-                "Imagen":"https://3.bp.blogspot.com/-u-yN3kRr03o/Wy1cxQU5wWI/AAAAAAAAL7I/5VlvYZ6Iev8eGYUHZ2LvUbG7XcAZp-1zQCLcBGAs/s1600/Guiso%2Bde%2BLentejas%2Bcon%2BPescado%2BFrito.jpg",
-                "Izq": "#5",
-                "Der": "#4"
-            }, {
-                "id" : 7,
-                "Restaurante": 2,
-                "Categoria": 3,
-                "Producto" : "Bisteck a lo pobre (papas, ensalada, arroz, platano y huevo)",
-                "Precio": 28.50,
-                "Imagen":"https://iperu.pe/wp-content/uploads/2019/08/bistec-a-lo-pobre_800x534.jpg",
-                "Izq": "#9",
-                "Der": "#8"
-            }, {
-                "id" : 8,
-                "Restaurante": 2,
-                "Categoria": 3,
-                "Producto" : "Bisteck (papas, ensalada y arroz)",
-                "Precio": 27.50,
-                "Imagen":"https://1.bp.blogspot.com/-4THw7fRcvBs/Wl6V87BAf2I/AAAAAAAAAEk/Tqh1sOnKZPANDwOO3-zyfGO-ImgU4lBBQCLcBGAs/s1600/Bistek%2Ba%2Bla%2BParrilla.jpg",
-                "Izq": "#7",
-                "Der": "#9"
-            }, {
-                "id" : 9,
-                "Restaurante": 2,
-                "Categoria": 3,
-                "Producto" : "Lomo salatado",
-                "Precio": 19.00,
-                "Imagen":"https://decomidaperuana.com/wp-content/uploads/2020/10/lomo-saltado.jpg",
-                "Izq": "#8",
-                "Der": "#7"
-            }
-        ]
-
-        platos_10Filtradas = []
+        
+        ListaPedidosQuerySet = PlatoRegistrado.objects.all()
+        
+        ListaPedidos = []
+        
+        
         #Convertir el tipo String a un int para q se conpare con el otro int=p["categoria"]
-        if categoria == "-1" and restaurante=="-1":
-            #no se va a filtrar
-            platos_10Filtradas = platos_10
+        if restaurante=="-1":
+          for c in ListaPedidosQuerySet:
+            print(c.cliente)
+            ListaPedidos.append({
+                      "id":c.id,
+                      "producto":c.producto,
+                      "codigo":c.codigo_verificación,
+                      "precio":str(c.precio),
+                      "cantidad":c.cantidad,
+                      "restaurante": {
+                        "nombre":c.restaurante.nombre
+                      },
+                      "categoria":{
+                        "nombre":c.categoría.nombre
+                      },
+                      "estado":c.estado
+                      
+            })
         else:
-            for p in platos_10:
-               if p["Categoria"] == int(categoria) and p["Restaurante"] == int(restaurante):
-                  platos_10Filtradas.append(p)
+            ListaPedidosQuerySet = PlatoRegistrado.objects.filter(categoría__nombre=categoria,restaurante__nombre=restaurante)
+            for c in ListaPedidosQuerySet:
+                
+                ListaPedidos.append({
+                      "id":c.id,
+                      "producto":c.producto,
+                      "codigo":c.codigo_verificación,
+                      "precio":str(c.precio),
+                      "cantidad":c.cantidad,
+                      "restaurante": {
+                        "nombre":c.restaurante.nombre
+                      },
+                      "categoria":{
+                        "nombre":c.categoría.nombre
+                      },
+                      "estado":c.estado
+                      
+                })
         
         # TODO: Consultas a base de datos
         dictResponse = {
             "error": "",
-            "platos_10": list(platos_10Filtradas)
+            "platos_10": list(ListaPedidos)
         }
         strResponse = json.dumps(dictResponse)
         return HttpResponse(strResponse)
@@ -222,13 +173,7 @@ def obtenerPlatos_10(request):
 @csrf_exempt
 def ObtenerCategorias_10(request):
     if request.method=="GET":
-        restaurante = request.GET.get("restaurante")
-        if restaurante == None:
-            dictError = {
-                "error": "Debe enviar una categoria y restaurante como query paremeter."
-            }
-            strError = json.dumps(dictError)
-            return HttpResponse(strError)
+        pedidosFiltradas = []
         pedidos = [
             {
                 "id": 1,
@@ -277,59 +222,65 @@ def ObtenerCategorias_10(request):
                 "Registrado" : "Si"
             }
         ]
-
-        pedidosFiltradas = []
+        restaurante = request.GET.get("restaurante")
+        if restaurante == None:
+            dictError = {
+                "error": "Debe enviar una categoria y restaurante como query paremeter."
+            }
+            strError = json.dumps(dictError)
+            return HttpResponse(strError)
+        
+        ListaPedidosQuerySet = PlatoRegistrado.objects.all()
+        
+        ListaPedidos = []
+        
+        
         #Convertir el tipo String a un int para q se conpare con el otro int=p["categoria"]
         if restaurante=="-1":
-            #no se va a filtrar
-            pedidosFiltradas = pedidos
+          for c in ListaPedidosQuerySet:
+            print(c.cliente)
+            ListaPedidos.append({
+                      "id":c.id,
+                      "producto":c.producto,
+                      "codigo":c.codigo_verificación,
+                      "precio":str(c.precio),
+                      "cantidad":c.cantidad,
+                      "restaurante": {
+                        "nombre":c.restaurante.nombre
+                      },
+                      "categoria":{
+                        "nombre":c.categoría.nombre
+                      },
+                      "estado":c.estado
+                      
+            })
         else:
-            for p in pedidos:
-               if p["Restaurante"] == restaurante:
-                  pedidosFiltradas.append(p)
+            ListaPedidosQuerySet = PlatoRegistrado.objects.filter(restaurante__nombre=restaurante)
+            for c in ListaPedidosQuerySet:
+                ListaPedidos.append({
+                      "id":c.id,
+                      "producto":c.producto,
+                      "codigo":c.codigo_verificación,
+                      "precio":str(c.precio),
+                      "cantidad":c.cantidad,
+                      "restaurante": {
+                        "nombre":c.restaurante.nombre
+                      },
+                      "categoria":{
+                        "nombre":c.categoría.nombre
+                      },
+                      "estado":c.estado
+                      
+                })
         
         # TODO: Consultas a base de datos
         dictResponse = {
             "error": "",
-            "pedidos": list(pedidosFiltradas)
+            "pedidos": list(ListaPedidos)
         }
         strResponse = json.dumps(dictResponse)
         return HttpResponse(strResponse)
-        """
-                        #HOLALAAALA
-        restaurante = request.GET.get("restaurante")        
-        ListaCategoria = PlatoRegistrado.objects.all()
-        ListaFiltrada = []
-        if restaurante == None:
-            dictError = {
-                "error": "Debe enviar una categoria como query paremeter."
-            }
-            strError = json.dumps(dictError)
-            return HttpResponse(strError)
-
-        if restaurante=="-1":
-            for c in ListaCategoria:
-                ListaFiltrada.append({
-                   "id":c.id,
-                   "nombre":c.producto,
-                   "categoría":c.categoría
-                })#convertido a lista de python
-        else:
-            for c in ListaCategoria:
-                if restaurante == c.restaurante:
-                    ListaFiltrada.append({
-                       "id":c.id,
-                       "nombre":c.producto,
-                       "categoría":c.categoría
-                   })#convertido a lista de python
-
-        dictOK = {
-            "error" : "",
-            "categoria" : ListaFiltrada
-        }
-        #Para retornarlo en el frondend, tengo que convertirlo a un String JSON y no dicc
-        return HttpResponse(json.dumps(dictOK))
-        """
+        
     else:
         dictError = {
             "error": "Tipo de peticion no existe"
@@ -364,6 +315,9 @@ def ObtenerPedidos_8(request):
                       "restaurante": {
                         "nombre":c.restaurante.nombre
                       },
+                      "categoria":{
+                        "nombre":c.categoría.nombre
+                      },
                       "estado":c.estado
                       
             })
@@ -378,7 +332,11 @@ def ObtenerPedidos_8(request):
                       "cantidad":c.cantidad,
                       "restaurante": {
                         "nombre":c.restaurante.nombre
-                      }
+                      },
+                      "categoria":{
+                        "nombre":c.categoría.nombre
+                      },
+                      "estado":c.estado
                       
                 })
 
@@ -478,17 +436,17 @@ def loginCliente(request):
         }
         strError = json.dumps(dictError)
         return HttpResponse(strError)
+"""
+http://localhost:8000/backend/ObtenerPedido_Estado_14/listar
+{
+    "id" : 1,
+    "estado" : "1"
+}
+"""
 @csrf_exempt
 def ObtenerPedido_Estado_14(request):
-    if request.method=="GET":
-        estado = request.GET.get("estado")
-        codigo = request.GET.get("codigo")
-        if estado == None and codigo ==None:
-            dictError = {
-                "error": "Debe enviar una categoria y restaurante como query paremeter."
-            }
-            strError = json.dumps(dictError)
-            return HttpResponse(strError)
+    if request.method=="POST":
+        
         pedidos = [
             {
                 "id": 1,
@@ -537,70 +495,45 @@ def ObtenerPedido_Estado_14(request):
                 "Registrado" : "Si"
             }
         ]
-
-        pedidosFiltradas = []
-        #Convertir el tipo String a un int para q se conpare con el otro int=p["categoria"]
-        for c in pedidos:
-            if int(codigo )== c["Codigo_verificacion"]:
-                c["Estado"] = estado
-        pedidosFiltradas = pedidos
-
-        # TODO: Consultas a base de datos
-        dictResponse = {
-            "error": "",
-            "pedidos": list(pedidosFiltradas)
-        }
-        strResponse = json.dumps(dictResponse)
-        return HttpResponse(strResponse)
-        """
-        ListaPedidosQuerySet = PlatoRegistrado.objects.all()
-        estado = request.GET.get("estado")
-        codigo = request.GET.get("codigo")
-        ListaPedidos = []
-
-        for c in ListaPedidosQuerySet:
-            if int(codigo )== c.codigo_verificación:
-                c.codigo_verificación = int(estado)
-
-        for c in ListaPedidosQuerySet:
-            ListaPedidos.append({
-                      "id":c.id,
-                      "producto":c.producto,
-                      "codigo":c.codigo_verificación,
-                      "precio":str(c.precio),
-                      "cantidad":c.cantidad,
-                      "estado":c.categoría,
-                      "restaurante": c.restaurante,
-                      "cliente": c.cliente,
-                      "estado":c.estado
-            })
-
+        
+        dicctCategoria = json.loads(request.body)
+        identificador = dicctCategoria["id"]
+        cat = PlatoRegistrado.objects.get(pk=identificador)
+        if dicctCategoria.get("estado") != None:
+           cat.estado = dicctCategoria.get("estado")
+        cat.save()
         dictOK = {
-            "error" : "",
-            "Pedidos" : ListaPedidos
+           "error" : ""
         }
         return HttpResponse(json.dumps(dictOK))
-        """
+        
     else:
         dictError = {
             "error" : "Tipo de petición incorrecto, usar GET"
         }
         strError = json.dumps(dictError)
         return HttpResponse(strError)
+#http://localhost:8000/backend/ObtenerPedido_Registrar_7/listar
+    """
+    {
+    "producto" : "Pizza",
+    "cantidad" : 3,
+    "precio" : 3.4,
+    "categoría" : 1,
+    "restaurante": 1,
+    "cliente": 1,
+    "codigo_verificación" : "53",
+    "estado":"3",
+    "registrado":"1"
+    }
+    """
 @csrf_exempt
 def ObtenerPedido_Registrar_7(request):
-    #http://localhost:8000/backend/ObtenerPedido_Registrar_7/listar?codigo=30&direccion=Distrito%2013%20%20jr%20Bolivar
+    
     #Nota: el espacio se hace con %20
     
-    if request.method=="GET":
-        direccion = request.GET.get("direccion")
-        codigo = request.GET.get("codigo")
-        if direccion == None and codigo ==None:
-            dictError = {
-                "error": "Debe enviar una categoria y restaurante como query paremeter."
-            }
-            strError = json.dumps(dictError)
-            return HttpResponse(strError)
+    if request.method=="POST":
+        
         pedidos = [
             {
                 "id": 1,
@@ -650,60 +583,43 @@ def ObtenerPedido_Registrar_7(request):
             }
         ]
 
-        pedidosFiltradas = []
-        #Convertir el tipo String a un int para q se conpare con el otro int=p["categoria"]
-        pedidosFiltradas = pedidos
-        pedidosFiltradas.append(
-            {
-                "Cliente":codigo,
-                "Direccion": direccion
-            }
-        )
-
-        # TODO: Consultas a base de datos
-        dictResponse = {
-            "error": "",
-            "pedidos": list(pedidosFiltradas)
+        #El Request esta siendo llamado.
+        dictCategoria = json.loads(request.body)
+        producto = dictCategoria["producto"]
+        cantidad = dictCategoria["cantidad"]
+        precio = dictCategoria["precio"]
+        categoría = dictCategoria["categoría"]
+        restaurante = dictCategoria["restaurante"]
+        cliente = dictCategoria["cliente"]
+        codigo_verificación = dictCategoria["codigo_verificación"]
+        estado = dictCategoria["estado"]
+        registrado = dictCategoria["registrado"]
+        
+        cat = PlatoRegistrado(
+            producto=producto, 
+            cantidad=cantidad,
+            precio=precio,
+            categoría =CategoriaPlato.objects.get(pk=categoría, on_delete=models.CASCADE),
+            restaurante =Restaurante.objects.get(pk=restaurante),
+            cliente =clienteulima.objects.get(pk=cliente),
+            codigo_verificación = codigo_verificación,
+            estado = estado,
+            registrado = registrado
+            )
+        #Codigo donde se registra la nueva categoria
+        cat.save()
+        dictOK = {
+           "error" : ""
         }
-        strResponse = json.dumps(dictResponse)
-        return HttpResponse(strResponse)
+        #Queremos hacer lo contrario
+        return HttpResponse(json.dumps(dictOK))
     else:
         dictError = {
             "error": "Tipo de petición no existe"
         }
         strError = json.dumps(dictError)
         return HttpResponse(strError)
-    """
-        ListaPedidosQuerySet = Pedidos.objects.all()
-        codigo = request.GET.get("codigo")
-        direccion = request.GET.get("direccion")
-        ListaPedidos = []
-
-        for c in ListaPedidosQuerySet:
-            ListaPedidos.append({
-                      "id":c.id,
-                      "producto":c.producto,
-                      "codigo":c.codigo_verificación,
-                      "precio":str(c.precio),
-                      "cantidad":c.cantidad,
-                      "estado":c.categoría,
-                      "restaurante": c.restaurante,
-                      "cliente": c.cliente,
-                      "estado":c.estado
-            })
-        ListaPedidos.append({
-            "codigo":codigo,
-            "direccion": direccion
-        })
-
-        dictOK = {
-            "error" : "",
-            "Pedidos" : ListaPedidos
-        }
-        return HttpResponse(json.dumps(dictOK))
-    """
     
-
 @csrf_exempt
 def register_plato(request):
     if request.method == 'POST':
