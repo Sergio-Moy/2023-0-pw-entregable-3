@@ -3,19 +3,14 @@ from django.http import HttpResponse
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
-from .models import Restaurant
-from .models import Dish
 from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 import json
-from . models import Categorias
 from django.http import JsonResponse
 from .models import Restaurante
-from . models import Pedidos
 from .models import clienteulima
-from .models import ofertas
-from .models import Plato
+from .models import Oferta
 from .models import PlatoRegistrado
 from .models import CategoriaPlato
 # Create your views here.
