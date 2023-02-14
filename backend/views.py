@@ -339,97 +339,33 @@ def ObtenerCategorias_10(request):
 @csrf_exempt
 def ObtenerPedidos_8(request):
     if request.method=="GET":
-        cliente = request.GET.get("codigo")
-        if cliente == None:
-            dictError = {
-                "error": "Debe enviar una categoria y restaurante como query paremeter."
-            }
-            strError = json.dumps(dictError)
-            return HttpResponse(strError)
-        pedidos = [
-            {
-                "id": 1,
-                "Restaurante": "Punto y Sabor",
-                "Categoria": "Bebidas",
-                "Producto" : "Limonada Frozen (1.5L)",
-                "Cantidad" : 3,
-                "Precio": 18.5,
-                "Cliente": 2020,
-                "Codigo_verificacion" : 51,
-                "Estado" : "Preparacion",
-                "Registrado" : "Si"
-            }, {
-                "id": 2,
-                "Restaurante": "Punto y Sabor",
-                "Categoria": "Bebidas",
-                "Producto" : "Cusqueña (310 ml)",
-                "Cantidad" : 2,
-                "Precio": 4.5,
-                "Cliente": 2020,
-                "Codigo_verificacion" : 52,
-                "Estado" : "Preparacion",
-                "Registrado" : "Si"
-            }, {
-                "id": 3,
-                "Restaurante": "Corralito",
-                "Categoria": "Bebidas",
-                "Producto" : "Inca Cola (1.5L)",
-                "Cantidad" : 2,
-                "Precio": 6.5,
-                "Cliente": 1166,
-                "Codigo_verificacion" : 53,
-                "Estado" : "Confirmacion",
-                "Registrado" : "Si"
-            },
-            {
-                "id" : 4,
-                "Restaurante": "Corralito",
-                "Categoria": "Carnes",
-                "Producto" : "Bisteck (papas, ensalada y arroz)",
-                "Cantidad" : 1,
-                "Precio": 27.50,
-                "Cliente": 1166,
-                "Codigo_verificacion" : 54,
-                "Estado" : "Confirmacion",
-                "Registrado" : "Si"
-            }
-        ]
-
-        pedidosFiltradas = []
-        #Convertir el tipo String a un int para q se conpare con el otro int=p["categoria"]
-        if cliente=="-1":
-            #no se va a filtrar
-            pedidosFiltradas = pedidos
-        else:
-            for p in pedidos:
-               if p["Cliente"] == int(cliente):
-                  pedidosFiltradas.append(p)
-        
-        # TODO: Consultas a base de datos
-        dictResponse = {
-            "error": "",
-            "pedidos": list(pedidosFiltradas)
-        }
-        strResponse = json.dumps(dictResponse)
-        return HttpResponse(strResponse)
-        """
         #Lista en formato QuerySet
         #all() = saca todo el contenido
         ListaPedidosQuerySet = PlatoRegistrado.objects.all()
         codigo = request.GET.get("codigo")
         ListaPedidos = []
+        if codigo == None:
+            dictError = {
+                "error": "Debe enviar una codigo como query paremeter."
+            }
+            strError = json.dumps(dictError)
+            return HttpResponse(strError)   
+
+        
         if codigo=="-1":
           for c in ListaPedidosQuerySet:
+            print(c.cliente)
             ListaPedidos.append({
                       "id":c.id,
                       "producto":c.producto,
                       "codigo":c.codigo_verificación,
                       "precio":str(c.precio),
                       "cantidad":c.cantidad,
-                      "estado":c.categoría,
-                      "restaurante": c.restaurante,
-                      "cliente": c.cliente,
+                      "restaurante": {
+                        "nombre":c.restaurante.nombre
+                      },
                       "estado":c.estado
+                      
             })
         else:
             ListaPedidosQuerySet = PlatoRegistrado.objects.filter(codigo_verificación=int(codigo))
@@ -440,10 +376,10 @@ def ObtenerPedidos_8(request):
                       "codigo":c.codigo_verificación,
                       "precio":str(c.precio),
                       "cantidad":c.cantidad,
-                      "estado":c.categoría,
-                      "restaurante": c.restaurante,
-                      "cliente": c.cliente,
-                      "estado":c.estado
+                      "restaurante": {
+                        "nombre":c.restaurante.nombre
+                      }
+                      
                 })
 
         dictOK = {
@@ -451,7 +387,7 @@ def ObtenerPedidos_8(request):
             "Pedidos" : ListaPedidos
         }
         return HttpResponse(json.dumps(dictOK))
-        """
+        
     else:
         dictError = {
             "error": "Tipo de peticion no existe"
