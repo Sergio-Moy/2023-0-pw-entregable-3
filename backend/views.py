@@ -688,28 +688,26 @@ def registrarentrega(request):
         {"code" : 789, "desc" : "Cheese Fingers Familiar", "code_v" : 987},
     ]
 
-    if request.method == "POST":
-        req = json.loads(request.body)
-        code = req["code"]
-        codev = req["code_v"]
-        error = "No se encontró un pedido con ese código"
-        for i in pedidos:
-            if code == i["code"]:
-                if codev == i["code_v"]:
-                    dictOk = {
-                        "error" : "",
-                        "mensaje" : "Código de verificación correcto, entrega registrada"
+    if request.method == "GET":
+        code = request.GET.get("code")
+        error = "No se encontró ese pedido"
+        if code != None:
+            for pedido in pedidos:
+                if int(code) == pedido["code"]:
+                    dictOK = {
+                        "error": "",
+                        "producto" : pedido
                     }
-                    strOk = json.dumps(dictOk)
-                    return HttpResponse(strOk)
-                else:
-                    error = "El código de verificación es incorrecto"
+                    strOK = json.dumps(dictOK)
+                    return HttpResponse(strOK)
+        else:
+            error = "Por favor envíe un código de pedido"
         dictError = {
             "error" : error
         }
         return HttpResponse(json.dumps(dictError))
     else:
-        return HttpResponse("Tipo de petición incorrecto, por favor usar POST")
+        return HttpResponse("Tipo de petición incorrecto, por favor usar GET")   
     
         
 @csrf_exempt
