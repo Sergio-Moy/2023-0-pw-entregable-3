@@ -842,3 +842,38 @@ def crearCategoria(request):
         "error" : ""
     }
     return HttpResponse(json.dumps(dictOK))
+
+@csrf_exempt
+def obtenerPlatosRegistradosPorRestaurante(request):
+    if request.method == "GET":
+        restaurante_id = request.GET.get("id")
+        platosQuerySet = PlatoRegistrado.objects.filter(restaurante_id=restaurante_id)
+        platos = []
+        for p in platosQuerySet:
+            platos.append({
+                "id": p.id,
+                "producto": p.producto,
+                "cantidad": p.cantidad,
+                "precio": p.precio,
+                "categoria_id": p.categoría.id,
+                "categoria_nombre": p.categoría.nombre,
+                "restaurante_id": p.restaurante.id,
+                "restaurante_nombre": p.restaurante.nombre,
+                "cliente_id": p.cliente.id,
+                "cliente_nombre": p.cliente.nombre,
+                "codigo_verificacion": p.codigo_verificación,
+                "estado": p.estado,
+                "registrado": p.registrado,
+            })
+
+        dictOK = {
+            "error": "",
+            "platos": platos
+        }
+        return HttpResponse(json.dumps(dictOK))
+    else:
+        dictError = {
+            "error": "Tipo de petición no existe"
+        }
+        strError = json.dumps(dictError)
+        return HttpResponse(strError)

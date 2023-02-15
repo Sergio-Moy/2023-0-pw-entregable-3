@@ -17,5 +17,6 @@ urlpatterns=[
     path("categoriaplatos", views.categoriaplatos),
     path("platosprueba", views.obtenerCategoriasPorRestaurante),
     path("crearplato",views.registrar_plato,),
-    path("nuevacategoria",views.crearCategoria)
+    path("nuevacategoria",views.crearCategoria),
+    path("platospedidos",views.obtenerPlatosRegistradosPorRestaurante)
 ]
