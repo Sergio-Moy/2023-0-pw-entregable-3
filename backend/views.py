@@ -514,96 +514,42 @@ def ObtenerPedido_Estado_14(request):
     """
 @csrf_exempt
 def ObtenerPedido_Registrar_7(request):
-    
-    #Nota: el espacio se hace con %20
+
+    #http://localhost:8000/backend/ObtenerPedido_Registrar_7/listar
+    pedidos = []
     
     if request.method=="POST":
-        
-        pedidos = [
-            {
-                "id": 1,
-                "Restaurante": "Punto y Sabor",
-                "Categoria": "Bebidas",
-                "Producto" : "Limonada Frozen (1.5L)",
-                "Cantidad" : 3,
-                "Precio": 18.5,
-                "Cliente": 2020,
-                "Codigo_verificacion" : 51,
-                "Estado" : "Preparacion",
-                "Registrado" : "Si"
-            }, {
-                "id": 2,
-                "Restaurante": "Punto y Sabor",
-                "Categoria": "Bebidas",
-                "Producto" : "Cusqueña (310 ml)",
-                "Cantidad" : 2,
-                "Precio": 4.5,
-                "Cliente": 2020,
-                "Codigo_verificacion" : 52,
-                "Estado" : "Preparacion",
-                "Registrado" : "Si"
-            }, {
-                "id": 3,
-                "Restaurante": "Corralito",
-                "Categoria": "Bebidas",
-                "Producto" : "Inca Cola (1.5L)",
-                "Cantidad" : 2,
-                "Precio": 6.5,
-                "Cliente": 1166,
-                "Codigo_verificacion" : 53,
-                "Estado" : "Confirmacion",
-                "Registrado" : "Si"
-            },
-            {
-                "id" : 4,
-                "Restaurante": "Corralito",
-                "Categoria": "Carnes",
-                "Producto" : "Bisteck (papas, ensalada y arroz)",
-                "Cantidad" : 1,
-                "Precio": 27.50,
-                "Cliente": 1166,
-                "Codigo_verificacion" : 54,
-                "Estado" : "Confirmacion",
-                "Registrado" : "Si"
-            }
-        ]
-
         #El Request esta siendo llamado.
-        dictCategoria = json.loads(request.body)
-        producto = dictCategoria["producto"]
-        cantidad = dictCategoria["cantidad"]
-        precio = dictCategoria["precio"]
-        categoría = dictCategoria["categoría"]
-        restaurante = dictCategoria["restaurante"]
-        cliente = dictCategoria["cliente"]
-        codigo_verificación = dictCategoria["codigo_verificación"]
-        estado = dictCategoria["estado"]
-        registrado = dictCategoria["registrado"]
-        
-        cat = PlatoRegistrado(
-            producto=producto, 
-            cantidad=cantidad,
-            precio=precio,
-            categoría =CategoriaPlato.objects.get(pk=categoría, on_delete=models.CASCADE),
-            restaurante =Restaurante.objects.get(pk=restaurante),
-            cliente =clienteulima.objects.get(pk=cliente),
-            codigo_verificación = codigo_verificación,
-            estado = estado,
-            registrado = registrado
-            )
-        #Codigo donde se registra la nueva categoria
-        cat.save()
-        dictOK = {
-           "error" : ""
-        }
-        #Queremos hacer lo contrario
-        return HttpResponse(json.dumps(dictOK))
-    else:
+        dictCode = json.loads(request.body)
+        Nombre = dictCode["Nombre"]
+        Producto = dictCode["Producto"]
+        Direccion = dictCode["Direccion"]
+        Cantidad = dictCode["Cantidad"]
+        error = "No se encontró ese pedido"
+        if Producto!=None and Nombre!=None and Direccion!=None and Cantidad!=None:
+            pedidos.append(
+                {
+                    "Nombre":Nombre,
+                    "Producto":Producto,
+                    "Direccion":Direccion,
+                    "Cantidad":Cantidad
+                }
+                )
+
+            dictOK = {
+                        "error": "",
+                        "producto" : pedidos
+            }
+            strOK = json.dumps(dictOK)
+            return HttpResponse(strOK)
+        else:
+            error = "Por favor envíe un Producto de pedido"
         dictError = {
-            "error": "Tipo de petición no existe"
+            "error" : error
         }
-        strError = json.dumps(dictError)
-        return HttpResponse(strError)
+        return HttpResponse(json.dumps(dictError))
+    else:
+        return HttpResponse("Tipo de petición incorrecto, por favor usar POST") 
     
 @csrf_exempt
 def register_plato(request):
