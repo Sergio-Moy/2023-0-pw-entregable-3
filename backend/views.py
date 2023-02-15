@@ -86,7 +86,8 @@ def loginRestaurante(request):
                 "restaurante": {
                     "nombre": restaurante.nombre,
                     "telefono": restaurante.telefono,
-                    "imagen":restaurante.imagen
+                    "imagen":restaurante.imagen,
+                    "id":restaurante.id
                 }
             }
             return HttpResponse(json.dumps(dictOK))
@@ -361,9 +362,12 @@ def ObtenerListado(request):
         categoria = request.GET.get("categoria")
         restaurantesFiltrados = []
 
-        for r in restaurantes:
-            if r["categoria"] == int(categoria):
-                restaurantesFiltrados.append(r)
+        if int(categoria) == 0:
+            restaurantesFiltrados = restaurantes
+        else:
+            for r in restaurantes:
+                if r["categoria"] == int(categoria):
+                    restaurantesFiltrados.append(r)
         dictResponse = {
             "error" : "",
             "restaurantes" : restaurantesFiltrados
@@ -376,7 +380,7 @@ def ObtenerListado(request):
             "error" : "Tipo de petición incorrecto, usar GET"
         }
         strError = json.dumps(dictError)
-        return HttpResponse(strError) 
+        return HttpResponse(strError)
 
 def ObtenerRecomendaciones(request):
     recomendaciones = [
@@ -602,14 +606,21 @@ def cambiarEstado(request):
         {"id" : 4, "detalles" : "Cono Vainilla", "status" : 1},
     ]
 
-    if request.method == "GET":
+    if request.method == "POST":
+        cambios = []
+        cuerpo = json.loads(request.body)
+        for p in cuerpo:
+            cambios.append(cuerpo[p])
+        for i in range(4):
+            if pedidos[i]["status"] < 2:
+                pedidos[i]["status"] = pedidos[i]["status"] + cambios[i]
         dictResponse = {
             "error" : "",
             "arreglo" : pedidos
         }
         return HttpResponse(json.dumps(dictResponse))
     else:
-        return HttpResponse("Tipo de petición incorrecto, por favor usar GET")
+        return HttpResponse("Tipo de petición incorrecto, por favor usar POST")
 
 @csrf_exempt
 def registrarentrega(request):
@@ -727,7 +738,107 @@ def categoriaplatos(request):
         }
         strResponse = json.dumps(dictResponse)
         return HttpResponse(strResponse)
-        
+@csrf_exempt       
+def obtenerCategoriasPorRestaurante(request):
+    if request.method == "GET":
+        restaurante_id=request.GET.get("id")
+        listaCategoriasQuerySet = CategoriaPlato.objects.filter(restaurante_id=restaurante_id)
+        listaCategorias = []
+        for c in listaCategoriasQuerySet:
+            listaCategorias.append({
+                "id" : c.id,
+                "nombre" : c.nombre
+            })
 
-    
-    
+        dictOK = {
+            "error" : "",
+            "categorias" : listaCategorias
+        }
+        return HttpResponse(json.dumps(dictOK))
+
+    else:
+        dictError = {
+            "error": "Tipo de petición no existe"
+        }
+        strError = json.dumps(dictError)
+        return HttpResponse(strError)
+
+@csrf_exempt
+def registrar_plato(request):
+    if request.method != "POST":
+        dictError = {
+            "error": "Tipo de petición no existe"
+        }
+        strError = json.dumps(dictError)
+        return HttpResponse(strError)
+
+    dictPlato = json.loads(request.body)
+    nombre = dictPlato["producto"]
+    categoria_id = dictPlato["categoria"]
+    imagen = dictPlato["imagen"]
+    precio = dictPlato["precio"]
+    restaurante_id = dictPlato["restaurante"]
+
+    # Obtener la categoria del plato
+    try:
+        categoria = CategoriaPlato.objects.get(id=categoria_id)
+    except CategoriaPlato.DoesNotExist:
+        dictError = {
+            "error": "La categoría especificada no existe"
+        }
+        strError = json.dumps(dictError)
+        return HttpResponse(strError)
+
+    # Obtener el restaurante
+    try:
+        restaurante = Restaurante.objects.get(id=restaurante_id)
+    except Restaurante.DoesNotExist:
+        dictError = {
+            "error": "El restaurante especificado no existe"
+        }
+        strError = json.dumps(dictError)
+        return HttpResponse(strError)
+
+    plato = MostrarPlato(
+        restaurante=restaurante,
+        categoría=categoria,
+        producto=nombre,
+        imagen=imagen,
+        precio=precio
+    )
+    plato.save()
+
+    dictOK = {
+        "error": ""
+    }
+    return HttpResponse(json.dumps(dictOK))
+
+@csrf_exempt
+def crearCategoria(request):
+    if request.method != "POST":
+        dictError = {
+            "error": "Tipo de petición no existe"
+        }
+        strError = json.dumps(dictError)
+        return HttpResponse(strError)
+
+    dictCategoria = json.loads(request.body)
+    restaurante_id = dictCategoria["restaurante"]
+    nombre = dictCategoria["nombre"]
+
+    try:
+        restaurante = Restaurante.objects.get(id=restaurante_id)
+    except Restaurante.DoesNotExist:
+        dictError = {
+            "error": "El restaurante no existe"
+        }
+        strError = json.dumps(dictError)
+        return HttpResponse(strError, status=404)
+
+    categoria = CategoriaPlato(restaurante=restaurante, nombre=nombre)
+    categoria.save()
+
+    dictOK = {
+        "error" : ""
+    }
+    return HttpResponse(json.dumps(dictOK))
