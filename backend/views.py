@@ -47,14 +47,17 @@ def obtener_restaurantes(request):
 @csrf_exempt
 def obtener_ofertas(request):
     if request.method == "GET":
-        verofertasQuerySet = ofertas.objects.all()
+        verofertasQuerySet = Oferta.objects.all()
         listadeofertas = []
         for v in verofertasQuerySet:
             listadeofertas.append({
-                "nombre" : v.name,
-                "codigo" : v.codigo,
-                "precio":v.password,
-                "restaurante":v.restaurante,
+                "id": v.id,
+                "nombre" : v.nombre,
+                "precio":v.precio,
+                "imagen": v.imagen,
+                "descripción": v.descripción,
+                "categoria_id": v.categoría_id,
+                "restaurante_id":v.restaurante_id,
             })
 
         dictOK = {
