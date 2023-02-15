@@ -13,6 +13,7 @@ from .models import clienteulima
 from .models import Oferta
 from .models import PlatoRegistrado
 from .models import CategoriaPlato
+from .models import MostrarPlato
 from django.db import models
 # Create your views here.
 
@@ -112,47 +113,43 @@ def obtenerPlatos_10(request):
             strError = json.dumps(dictError)
             return HttpResponse(strError)
         
-        ListaPedidosQuerySet = PlatoRegistrado.objects.all()
+        ListaPedidosQuerySet = MostrarPlato.objects.all()
         
         ListaPedidos = []
         
         
         #Convertir el tipo String a un int para q se conpare con el otro int=p["categoria"]
-        if restaurante=="-1":
+        if categoria=="-1":
+          ListaPedidosQuerySet = MostrarPlato.objects.filter(restaurante__nombre=restaurante)
           for c in ListaPedidosQuerySet:
-            print(c.cliente)
             ListaPedidos.append({
                       "id":c.id,
                       "producto":c.producto,
-                      "codigo":c.codigo_verificación,
                       "precio":str(c.precio),
-                      "cantidad":c.cantidad,
                       "restaurante": {
                         "nombre":c.restaurante.nombre
                       },
                       "categoria":{
                         "nombre":c.categoría.nombre
                       },
-                      "estado":c.estado
+                      "imagen":c.imagen
                       
             })
         else:
-            ListaPedidosQuerySet = PlatoRegistrado.objects.filter(categoría__nombre=categoria,restaurante__nombre=restaurante)
+            ListaPedidosQuerySet = MostrarPlato.objects.filter(categoría__nombre=categoria,restaurante__nombre=restaurante)
             for c in ListaPedidosQuerySet:
                 
                 ListaPedidos.append({
                       "id":c.id,
                       "producto":c.producto,
-                      "codigo":c.codigo_verificación,
                       "precio":str(c.precio),
-                      "cantidad":c.cantidad,
                       "restaurante": {
                         "nombre":c.restaurante.nombre
                       },
                       "categoria":{
                         "nombre":c.categoría.nombre
                       },
-                      "estado":c.estado
+                      "imagen":c.imagen
                       
                 })
         
@@ -230,7 +227,7 @@ def ObtenerCategorias_10(request):
             strError = json.dumps(dictError)
             return HttpResponse(strError)
         
-        ListaPedidosQuerySet = PlatoRegistrado.objects.all()
+        ListaPedidosQuerySet = CategoriaPlato.objects.all()
         
         ListaPedidos = []
         
@@ -238,38 +235,23 @@ def ObtenerCategorias_10(request):
         #Convertir el tipo String a un int para q se conpare con el otro int=p["categoria"]
         if restaurante=="-1":
           for c in ListaPedidosQuerySet:
-            print(c.cliente)
             ListaPedidos.append({
                       "id":c.id,
-                      "producto":c.producto,
-                      "codigo":c.codigo_verificación,
-                      "precio":str(c.precio),
-                      "cantidad":c.cantidad,
+                      "nombre":c.nombre,
                       "restaurante": {
                         "nombre":c.restaurante.nombre
-                      },
-                      "categoria":{
-                        "nombre":c.categoría.nombre
-                      },
-                      "estado":c.estado
+                      }
                       
             })
         else:
-            ListaPedidosQuerySet = PlatoRegistrado.objects.filter(restaurante__nombre=restaurante)
+            ListaPedidosQuerySet = CategoriaPlato.objects.filter(restaurante__nombre=restaurante)
             for c in ListaPedidosQuerySet:
                 ListaPedidos.append({
                       "id":c.id,
-                      "producto":c.producto,
-                      "codigo":c.codigo_verificación,
-                      "precio":str(c.precio),
-                      "cantidad":c.cantidad,
+                      "nombre":c.nombre,
                       "restaurante": {
                         "nombre":c.restaurante.nombre
-                      },
-                      "categoria":{
-                        "nombre":c.categoría.nombre
-                      },
-                      "estado":c.estado
+                      }
                       
                 })
         
@@ -688,8 +670,9 @@ def registrarentrega(request):
         {"code" : 789, "desc" : "Cheese Fingers Familiar", "code_v" : 987},
     ]
 
-    if request.method == "GET":
-        code = request.GET.get("code")
+    if request.method == "POST":
+        dictCode = json.loads(request.body)
+        code = dictCode["code"]
         error = "No se encontró ese pedido"
         if code != None:
             for pedido in pedidos:
@@ -707,7 +690,7 @@ def registrarentrega(request):
         }
         return HttpResponse(json.dumps(dictError))
     else:
-        return HttpResponse("Tipo de petición incorrecto, por favor usar GET")   
+        return HttpResponse("Tipo de petición incorrecto, por favor usar POST") 
     
         
 @csrf_exempt
