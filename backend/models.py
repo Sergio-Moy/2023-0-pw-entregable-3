@@ -89,3 +89,11 @@ class PlatoRegistrado(models.Model):
     )
     def __str__(self):
         return self.producto
+
+class Recomendacion(models.Model):
+    nombre = models.CharField(max_length=100)
+    imagen = models.URLField(max_length=300)
+    texto = models.TextField()
+
+    def __str__(self):
+        return self.nombre
