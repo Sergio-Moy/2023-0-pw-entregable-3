@@ -353,7 +353,7 @@ def ObtenerListado(request):
             restaurantes.append({
                 "nombre" : r.nombre,
                 "categoria" : r.categoría.id,
-                "estado" : 1,
+                "estado" : int(r.estado),
                 "imagen" : r.imagen
             })
 

@@ -16,6 +16,14 @@ class Restaurante(models.Model):
     telefono = models.CharField(max_length=255)
     categoría = models.ForeignKey(CategoriaRestaurante, on_delete=models.CASCADE)
     imagen = models.URLField(max_length = 300)
+    estado = models.CharField(
+        max_length=1,
+        choices=(
+            ('1', 'Abierto'),
+            ('0', 'Cerrado')
+        ),
+        default=1
+    )
     def __str__(self):
         return self.nombre
 
