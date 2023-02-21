@@ -341,36 +341,25 @@ def ObtenerPedidos_8(request):
 
 def ObtenerListado(request):
     if request.method == "GET":
-        restaurantes = [
-            {"id": 1, "nombre": "Cafeteria F", "categoria" : 1, "estado" : 1, "imagen" : "https://i.imgur.com/PoeLtRF.png"},
-            {"id": 2, "nombre": "Cafeteria O", "categoria" : 1, "estado" : 1, "imagen" : "https://i.imgur.com/PoeLtRF.png"},
-            {"id": 3, "nombre": "Cayetana", "categoria" : 2, "estado" : 1, "imagen" : "https://i.imgur.com/Gj3oj0r.png"},
-            {"id": 4, "nombre": "Capirotes", "categoria" : 2, "estado" : 1, "imagen" : "https://i.imgur.com/Gj3oj0r.png"},
-            {"id": 5, "nombre": "Bembos", "categoria" : 3, "estado" : 1, "imagen" : "https://i.imgur.com/wRAODhP.png"},
-            {"id": 6, "nombre": "Chifa Express", "categoria" : 3, "estado" : 0, "imagen" : "https://i.imgur.com/FlCQAxe.png"},
-            {"id": 7, "nombre": "Mr. Sushi", "categoria" : 3, "estado" : 0, "imagen" : "https://i.imgur.com/XBz0LyW.png"},
-            {"id": 8, "nombre": "Nevera Fit", "categoria" : 3, "estado" : 1, "imagen" : "https://i.imgur.com/4LKr8Hm.png"},
-            {"id": 9, "nombre": "Dunkin' Donuts", "categoria" : 4, "estado" : 1, "imagen" : "https://i.imgur.com/gE20Djg.png"},
-            {"id": 10, "nombre": "GoGreen", "categoria" : 4, "estado" : 1, "imagen" : "https://i.imgur.com/rbPjXK5.png"},
-            {"id": 11, "nombre": "Momenti", "categoria" : 4, "estado" : 1, "imagen" : "https://i.imgur.com/vYgSE5e.png"},
-            {"id": 12, "nombre": "Starbucks", "categoria" : 4, "estado" : 0, "imagen" : "https://i.imgur.com/bzLj6kE.png"},
-            {"id": 13, "nombre": "Listo", "categoria" : 5, "estado" : 1, "imagen" : "https://i.imgur.com/rAV8SfV.png"},
-            {"id": 14, "nombre": "Quiosco D", "categoria" : 5, "estado" : 0, "imagen" : "https://i.imgur.com/afudJgV.png"},
-            {"id": 15, "nombre": "Quiosco N", "categoria" : 5, "estado" : 1, "imagen" : "https://i.imgur.com/afudJgV.png"},
-            ]
-
         categoria = request.GET.get("categoria")
-        restaurantesFiltrados = []
-
         if int(categoria) == 0:
-            restaurantesFiltrados = restaurantes
+            restaurantesQueryset = Restaurante.objects.all()
         else:
-            for r in restaurantes:
-                if r["categoria"] == int(categoria):
-                    restaurantesFiltrados.append(r)
+            categorias = ["", "Cafeteria", "Food Trucks", "Platos", "Snacks", "Tiendas"]
+            restaurantesQueryset = Restaurante.objects.filter(categoría__categoría=categorias[int(categoria)])
+        
+        restaurantes = []
+        for r in restaurantesQueryset:
+            restaurantes.append({
+                "nombre" : r.nombre,
+                "categoria" : r.categoría.id,
+                "estado" : 1,
+                "imagen" : r.imagen
+            })
+
         dictResponse = {
             "error" : "",
-            "restaurantes" : restaurantesFiltrados
+            "restaurantes" : restaurantes
         }
         strResponse = json.dumps(dictResponse)
         return HttpResponse(strResponse)
@@ -505,15 +494,15 @@ def ObtenerPedido_Estado_14(request):
 #http://localhost:8000/backend/ObtenerPedido_Registrar_7/listar
     """
     {
-    "producto" : "Pizza",
-    "cantidad" : 3,
-    "precio" : 3.4,
-    "categoría" : 1,
-    "restaurante": 1,
-    "cliente": 1,
-    "codigo_verificación" : "53",
-    "estado":"3",
-    "registrado":"1"
+    "Producto" : "Pizza",
+    "Cantidad" : 3,
+    "Precio" : 3.4,
+    "Categoria_id" : 1,
+    "Restaurante_id": 1,
+    "Cliente_id": 1,
+    "Codigo_verificación_id" : "53",
+    "Estado":"1",
+    "Registrado":"1"
     }
     """
 @csrf_exempt
@@ -525,35 +514,133 @@ def ObtenerPedido_Registrar_7(request):
     if request.method=="POST":
         #El Request esta siendo llamado.
         dictCode = json.loads(request.body)
-        Nombre = dictCode["Nombre"]
         Producto = dictCode["Producto"]
-        Direccion = dictCode["Direccion"]
         Cantidad = dictCode["Cantidad"]
-        error = "No se encontró ese pedido"
-        if Producto!=None and Nombre!=None and Direccion!=None and Cantidad!=None:
-            pedidos.append(
-                {
-                    "Nombre":Nombre,
-                    "Producto":Producto,
-                    "Direccion":Direccion,
-                    "Cantidad":Cantidad
-                }
-                )
-
-            dictOK = {
-                        "error": "",
-                        "producto" : pedidos
+        Precio = dictCode["Precio"]
+        Categoria_id = dictCode["Categoria_id"]
+        Restaurante_id = dictCode["Restaurante_id"]
+        Cliente_id = dictCode["Cliente_id"]
+        Codigo_verificación = dictCode["Codigo_verificación"]
+        Estado = dictCode["Estado"]
+        Registrado = dictCode["Registrado"]
+        try:
+            Categoria = CategoriaPlato.objects.get(id=Categoria_id)
+        #En caso no se encuentre CategoriaPlato
+        except CategoriaPlato.DoesNotExist:
+            error = "La Categoria ingresada no se encuentra en la base de datos"
+            dictError = {
+               "error" : error
             }
-            strOK = json.dumps(dictOK)
-            return HttpResponse(strOK)
-        else:
-            error = "Por favor envíe un Producto de pedido"
+            return HttpResponse(json.dumps(dictError))
+        try:
+            restaurantE = Restaurante.objects.get(id=Restaurante_id)
+        #En caso no se encuentre CategoriaPlato
+        except Restaurante.DoesNotExist:
+            error = "El Restaurante ingresado no se encuentra en la base de datos"
+            dictError = {
+               "error" : error
+            }
+            return HttpResponse(json.dumps(dictError))
+        try:
+            Cliente = clienteulima.objects.get(id=Cliente_id)
+        #En caso no se encuentre CategoriaPlato
+        except clienteulima.DoesNotExist:
+            error = "El Cliente ingresado no se encuentra en la base de datos"
+            dictError = {
+               "error" : error
+            }
+            return HttpResponse(json.dumps(dictError))
+#HISOPO
+        pedido = PlatoRegistrado(
+            Producto=Producto,
+            Cantidad=int(Cantidad),
+            Precio=float(Precio),
+            Categoria=Categoria,
+            restaurantE=restaurantE,
+            Cliente=Cliente,
+            Codigo_verificación=Codigo_verificación,
+            Estado=Estado,
+            Registrado=Registrado
+        )
+        pedido.save()
+        dictError = {
+            "error" : ""
+        }
+        return HttpResponse(json.dumps(dictError))
+    else:
+        error = "Tipo de petición incorrecto, por favor usar POST"
         dictError = {
             "error" : error
         }
         return HttpResponse(json.dumps(dictError))
+
+@csrf_exempt
+def ObtenerSoloRestaurante_7(request):
+    if request.method=="GET":
+        #Lista en formato QuerySet
+        #all() = saca todo el contenido
+        ListaPedidosQuerySet = Restaurante.objects.all()
+        codigo = request.GET.get("codigo")
+        ListaPedidos = []
+        if codigo == None:
+            dictError = {
+                "error": "Debe enviar una codigo como query paremeter."
+            }
+            strError = json.dumps(dictError)
+            return HttpResponse(strError)   
+        if codigo=="-1":
+          for c in ListaPedidosQuerySet:
+            ListaPedidos.append({
+                      "id":c.id,
+                      "nombre":c.nombre
+            })
+
+        dictOK = {
+            "error" : "",
+            "Pedidos" : ListaPedidos
+        }
+        return HttpResponse(json.dumps(dictOK))
+        
     else:
-        return HttpResponse("Tipo de petición incorrecto, por favor usar POST") 
+        dictError = {
+            "error": "Tipo de peticion no existe"
+        }
+        strError = json.dumps(dictError)
+        return HttpResponse(strError)
+
+@csrf_exempt
+def ObtenerSoloCliente_7(request):
+    if request.method=="GET":
+        #Lista en formato QuerySet
+        #all() = saca todo el contenido
+        ListaPedidosQuerySet = clienteulima.objects.all()
+        codigo = request.GET.get("codigo")
+        ListaPedidos = []
+        if codigo == None:
+            dictError = {
+                "error": "Debe enviar una codigo como query paremeter."
+            }
+            strError = json.dumps(dictError)
+            return HttpResponse(strError)   
+        if codigo=="-1":
+          for c in ListaPedidosQuerySet:
+            ListaPedidos.append({
+                      "id":c.id,
+                      "nombre":c.nombre
+            })
+
+        dictOK = {
+            "error" : "",
+            "Pedidos" : ListaPedidos
+        }
+        return HttpResponse(json.dumps(dictOK))
+        
+    else:
+        dictError = {
+            "error": "Tipo de peticion no existe"
+        }
+        strError = json.dumps(dictError)
+        return HttpResponse(strError)
     
 @csrf_exempt
 def register_plato(request):

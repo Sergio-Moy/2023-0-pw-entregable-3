@@ -12,6 +12,8 @@ urlpatterns=[
     path("ofertas", views.obtener_ofertas),
     path("ObtenerPedido_Estado_14/listar", views.ObtenerPedido_Estado_14),
     path("ObtenerPedido_Registrar_7/listar",views.ObtenerPedido_Registrar_7),
+    path("ObtenerSoloRestaurante_7/listar",views.ObtenerSoloRestaurante_7),
+    path("ObtenerSoloCliente_7/listar",views.ObtenerSoloCliente_7),
     path("cambiarestado", views.cambiarEstado),
     path("registrarentrega", views.registrarentrega),
     path("categoriaplatos", views.categoriaplatos),
