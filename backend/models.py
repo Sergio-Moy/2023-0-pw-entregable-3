@@ -14,7 +14,7 @@ class Restaurante(models.Model):
     password = models.CharField(max_length=255)
     nombre = models.CharField(max_length=255)
     telefono = models.CharField(max_length=255)
-    categoría = models.ForeignKey(CategoriaRestaurante, on_delete=models.CASCADE)
+    categoria = models.ForeignKey(CategoriaRestaurante, on_delete=models.CASCADE)
     imagen = models.URLField(max_length = 300)
     estado = models.CharField(
         max_length=1,
