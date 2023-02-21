@@ -570,23 +570,38 @@ def ObtenerPedido_Registrar_7(request):
             registrado=Registrado
         )
         pedido.save()
-        """
+
+        if Estado=="1":
+            rptaE="Confirmado"
+        elif Estado=="2":
+            rptaE="En preparación"
+        else:
+            rptaE="Entregado"
+        
+
+        if Registrado=="1":
+            rptaR = "Si"
+        else:
+            rptaR="No"
+        
         pedidos.append(
             {
         "Producto" : Producto,
-        "Cantidad" : int(Cantidad),
-        "Precio" : float(Precio),
-        "Categoria_id" : Categoria,
-        "Restaurante_id" : restaurantE,
-        "Cliente_id" : Cliente,
+        "Cantidad" : Cantidad,
+        "Precio" : Precio,
+        "Total" : float(Cantidad)*float(Precio),
+        "Categoria" : Categoria.nombre,
+        "Restaurante" : restaurantE.nombre,
+        "Cliente" : Cliente.nombre,
         "Codigo_verificación" : Codigo_verificación,
-        "Estado" : Estado,
-        "Registrado" : Registrado
+        "Estado" : rptaE,
+        "Registrado" : rptaR
         }
         )
-        """
+        
         dictError = {
             "error" : "",
+            "pedidos":pedidos
             
         }
         return HttpResponse(json.dumps(dictError))
