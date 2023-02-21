@@ -515,7 +515,6 @@ def ObtenerPedido_Estado_14(request):
     """
 @csrf_exempt
 def ObtenerPedido_Registrar_7(request):
-
     #http://localhost:8000/backend/ObtenerPedido_Registrar_7/listar
     pedidos = []
     
@@ -532,7 +531,7 @@ def ObtenerPedido_Registrar_7(request):
         Estado = dictCode["Estado"]
         Registrado = dictCode["Registrado"]
         try:
-            Categoria = CategoriaPlato.objects.get(id=Categoria_id)
+            Categoria = CategoriaPlato.objects.get(id= Categoria_id)
         #En caso no se encuentre CategoriaPlato
         except CategoriaPlato.DoesNotExist:
             error = "La Categoria ingresada no se encuentra en la base de datos"
@@ -541,7 +540,7 @@ def ObtenerPedido_Registrar_7(request):
             }
             return HttpResponse(json.dumps(dictError))
         try:
-            restaurantE = Restaurante.objects.get(id=Restaurante_id)
+            restaurantE = Restaurante.objects.get(id= Restaurante_id)
         #En caso no se encuentre CategoriaPlato
         except Restaurante.DoesNotExist:
             error = "El Restaurante ingresado no se encuentra en la base de datos"
@@ -550,7 +549,7 @@ def ObtenerPedido_Registrar_7(request):
             }
             return HttpResponse(json.dumps(dictError))
         try:
-            Cliente = clienteulima.objects.get(id=Cliente_id)
+            Cliente = clienteulima.objects.get(id= Cliente_id)
         #En caso no se encuentre CategoriaPlato
         except clienteulima.DoesNotExist:
             error = "El Cliente ingresado no se encuentra en la base de datos"
@@ -560,19 +559,35 @@ def ObtenerPedido_Registrar_7(request):
             return HttpResponse(json.dumps(dictError))
 #HISOPO
         pedido = PlatoRegistrado(
-            Producto=Producto,
-            Cantidad=int(Cantidad),
-            Precio=float(Precio),
-            Categoria=Categoria,
-            restaurantE=restaurantE,
-            Cliente=Cliente,
-            Codigo_verificación=Codigo_verificación,
-            Estado=Estado,
-            Registrado=Registrado
+            producto=Producto,
+            cantidad=int(Cantidad),
+            precio=float(Precio),
+            categoría=Categoria,
+            restaurante=restaurantE,
+            cliente=Cliente,
+            codigo_verificación=Codigo_verificación,
+            estado=Estado,
+            registrado=Registrado
         )
         pedido.save()
+        """
+        pedidos.append(
+            {
+        "Producto" : Producto,
+        "Cantidad" : int(Cantidad),
+        "Precio" : float(Precio),
+        "Categoria_id" : Categoria,
+        "Restaurante_id" : restaurantE,
+        "Cliente_id" : Cliente,
+        "Codigo_verificación" : Codigo_verificación,
+        "Estado" : Estado,
+        "Registrado" : Registrado
+        }
+        )
+        """
         dictError = {
-            "error" : ""
+            "error" : "",
+            
         }
         return HttpResponse(json.dumps(dictError))
     else:
@@ -581,6 +596,7 @@ def ObtenerPedido_Registrar_7(request):
             "error" : error
         }
         return HttpResponse(json.dumps(dictError))
+        
 
 @csrf_exempt
 def ObtenerSoloRestaurante_7(request):
