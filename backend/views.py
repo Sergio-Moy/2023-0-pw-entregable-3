@@ -344,10 +344,10 @@ def ObtenerListado(request):
     if request.method == "GET":
         categoria = request.GET.get("categoria")
         if int(categoria) == 0:
-            restaurantesQueryset = Restaurante.objects.all()
+            restaurantesQueryset = Restaurante.objects.all().order_by('nombre')
         else:
             categorias = ["", "Cafeteria", "Food Trucks", "Platos", "Snacks", "Tiendas"]
-            restaurantesQueryset = Restaurante.objects.filter(categoría__categoría=categorias[int(categoria)])
+            restaurantesQueryset = Restaurante.objects.filter(categoría__categoría=categorias[int(categoria)]).order_by('nombre')
         
         restaurantes = []
         for r in restaurantesQueryset:
