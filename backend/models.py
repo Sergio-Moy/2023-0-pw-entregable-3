@@ -77,7 +77,7 @@ class PlatoRegistrado(models.Model):
         choices=(
             ('1', 'Confirmado'),
             ('2', 'En preparación'),
-            ('3', 'Entregado')
+            ('3', 'Terminado')
         )
     )
     registrado = models.CharField(

@@ -725,28 +725,27 @@ def register_categoria(request):
 
 @csrf_exempt
 def cambiarEstado(request):
-    pedidos = [
-        {"id" : 1, "detalles" : "Cheeseburger Regular", "status" : 0},
-        {"id" : 2, "detalles" : "Papas Regulares", "status" : 1},
-        {"id" : 3, "detalles" : "Bebida Mediana", "status" : 2},
-        {"id" : 4, "detalles" : "Cono Vainilla", "status" : 1},
-    ]
 
-    if request.method == "POST":
-        cambios = []
-        cuerpo = json.loads(request.body)
-        for p in cuerpo:
-            cambios.append(cuerpo[p])
-        for i in range(4):
-            if pedidos[i]["status"] < 2:
-                pedidos[i]["status"] = pedidos[i]["status"] + cambios[i]
+    # cuando quiere obtener los pedidos, llama un GET
+    if request.method == "GET":
+        pedidosQuerySet = PlatoRegistrado.objects.all().order_by('id')
+        pedidos = []
+        for p in pedidosQuerySet:
+            pedidos.append({"id" : p.id, "detalles" : p.producto, "status" : int(p.estado)})
         dictResponse = {
             "error" : "",
             "arreglo" : pedidos
         }
         return HttpResponse(json.dumps(dictResponse))
+    # cuando quiere modificar un pedido, llama un POST
+    elif request.method == "POST":
+        cuerpo = json.loads(request.body)
+        identifier = cuerpo["id"]
+        estado = cuerpo["estado"]
+        PlatoRegistrado.objects.filter(pk=identifier).update(estado=estado)
+        return HttpResponse("Se actualizo el pedido correctamente")
     else:
-        return HttpResponse("Tipo de petición incorrecto, por favor usar POST")
+        return HttpResponse("Tipo de petición incorrecto")
 
 @csrf_exempt
 def registrarentrega(request):
