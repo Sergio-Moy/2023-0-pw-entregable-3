@@ -749,33 +749,99 @@ def cambiarEstado(request):
 
 @csrf_exempt
 def registrarentrega(request):
-    pedidos = [
-        {"code" : 123, "desc" : "Cheeseburger, Papas", "code_v" : 321},
-        {"code" : 456, "desc" : "2x Cono Vainilla", "code_v" : 654},
-        {"code" : 789, "desc" : "Cheese Fingers Familiar", "code_v" : 987},
-    ]
-
+    pedidos = []
+    estados_imprimir = ["Confirmado", "En preparación", "Entregado"]
     if request.method == "POST":
         dictCode = json.loads(request.body)
-        code = dictCode["code"]
-        error = "No se encontró ese pedido"
-        if code != None:
-            for pedido in pedidos:
-                if int(code) == pedido["code"]:
-                    dictOK = {
-                        "error": "",
-                        "producto" : pedido
-                    }
-                    strOK = json.dumps(dictOK)
-                    return HttpResponse(strOK)
-        else:
-            error = "Por favor envíe un código de pedido"
-        dictError = {
-            "error" : error
-        }
-        return HttpResponse(json.dumps(dictError))
+        Codigo_verificación = dictCode["Codigo_verificación"]
+
+        try:
+            cat = PlatoRegistrado.objects.get(codigo_verificación=Codigo_verificación)
+            if dictCode.get("estado") != None:
+              cat.estado = dictCode.get("estado")
+            #Codigo donde se registra la nuevo estado
+            cat.save()
+            filtrado = PlatoRegistrado.objects.filter(codigo_verificación=Codigo_verificación)
+            for c in filtrado:#A esto se refiere con iterable
+                pedidos.append({
+                  "codigo_verificación":c.codigo_verificación,
+                  "cliente":c.cliente.nombre,
+                  "producto":c.producto,
+                  "cantidad":c.cantidad,
+                  "precio":c.precio,
+                  "Total": c.precio*c.cantidad,
+                  "estado":estados_imprimir[int(c.estado)-1]
+                })
+            dictOK = {
+              "error" : "",
+              "pedidos":pedidos
+            }
+            return HttpResponse(json.dumps(dictOK))
+        
+        except cat.DoesNotExist:
+           dictError = {
+               "error": "No se encontró ese pedido"
+           }
+           strError = json.dumps(dictError)
+           return HttpResponse(json.dumps(strError))
+        
     else:
         return HttpResponse("Tipo de petición incorrecto, por favor usar POST") 
+
+@csrf_exempt
+def ObtenerSoloPedido_filrado_codigo(request):
+    if request.method=="GET":
+        #Lista en formato QuerySet
+        #all() = saca todo el contenido
+        codigo = request.GET.get("codigo")
+        ListaPedidos = []
+        estados_imprimir = ["Confirmado", "En preparación", "Entregado"]
+
+        if codigo == None:
+            dictError = {
+                "error": "Debe enviar una codigo como query paremeter."
+            }
+            strError = json.dumps(dictError)
+            return HttpResponse(strError)
+        if codigo != "-1":   
+           ListaPedidosQuerySet = PlatoRegistrado.objects.filter(codigo_verificación=codigo)
+        
+           for c in ListaPedidosQuerySet:
+             ListaPedidos.append({
+                  "codigo_verificación":c.codigo_verificación,
+                  "cliente":c.cliente.nombre,
+                  "producto":c.producto,
+                  "cantidad":c.cantidad,
+                  "precio":c.precio,
+                  "Total": c.precio*c.cantidad,
+                  "estado":estados_imprimir[int(c.estado)-1]
+                })
+        else:
+            ListaPedidosQuerySet = PlatoRegistrado.objects.all()
+        
+            for c in ListaPedidosQuerySet:
+              ListaPedidos.append({
+                  "codigo_verificación":c.codigo_verificación,
+                  "cliente":c.cliente.nombre,
+                  "producto":c.producto,
+                  "cantidad":c.cantidad,
+                  "precio":c.precio,
+                  "Total": c.precio*c.cantidad,
+                  "estado":estados_imprimir[int(c.estado)-1]
+                })
+
+        dictOK = {
+            "error" : "",
+            "Pedidos" : ListaPedidos
+        }
+        return HttpResponse(json.dumps(dictOK))
+        
+    else:
+        dictError = {
+            "error": "Tipo de petición incorrecto, por favor usar GET"
+        }
+        strError = json.dumps(dictError)
+        return HttpResponse(strError)
     
         
 @csrf_exempt
