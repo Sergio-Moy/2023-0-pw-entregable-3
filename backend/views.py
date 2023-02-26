@@ -21,20 +21,20 @@ from django.db import models
 @csrf_exempt
 def obtener_restaurantes(request):
     if request.method == "GET":
-        listaCategoriasQuerySet = Restaurant.objects.all()
+        listaCategoriasQuerySet = Restaurante.objects.all()
         listaCategorias = []
         for c in listaCategoriasQuerySet:
             listaCategorias.append({
-                "name" : c.name,
+                "id": c.id,
+                "nombre" : c.nombre,
                 "email" : c.email,
                 "password":c.password,
-                "address":c.address,
-                "phone":c.phone
+                "phone":c.telefono
             })
 
         dictOK = {
             "error" : "",
-            "categorias" : listaCategorias
+            "restaurantes" : listaCategorias
         }
         return HttpResponse(json.dumps(dictOK))
 
@@ -44,6 +44,7 @@ def obtener_restaurantes(request):
         }
         strError = json.dumps(dictError)
         return HttpResponse(strError)
+
 
 @csrf_exempt
 def obtener_ofertas(request):
@@ -119,13 +120,15 @@ def obtenerPlatos_10(request):
             return HttpResponse(strError)
         
         ListaPedidosQuerySet = MostrarPlato.objects.all()
-        
+        print(ListaPedidosQuerySet)
         ListaPedidos = []
+
         
         
         #Convertir el tipo String a un int para q se conpare con el otro int=p["categoria"]
         if categoria=="-1":
-          ListaPedidosQuerySet = MostrarPlato.objects.filter(restaurante__nombre=restaurante)
+          print(MostrarPlato.objects)
+          ListaPedidosQuerySet = MostrarPlato.objects.filter(restaurante_id=restaurante)
           for c in ListaPedidosQuerySet:
             ListaPedidos.append({
                       "id":c.id,
@@ -141,9 +144,9 @@ def obtenerPlatos_10(request):
                       
             })
         else:
-            ListaPedidosQuerySet = MostrarPlato.objects.filter(categoría__nombre=categoria,restaurante__nombre=restaurante)
+            print("categoria", categoria, " restaurante" + restaurante)
+            ListaPedidosQuerySet = MostrarPlato.objects.filter(categoría_id=categoria, restaurante_id=restaurante) 
             for c in ListaPedidosQuerySet:
-                
                 ListaPedidos.append({
                       "id":c.id,
                       "producto":c.producto,
