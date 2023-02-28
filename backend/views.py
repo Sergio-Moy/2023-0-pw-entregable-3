@@ -126,8 +126,7 @@ def obtenerPlatos_10(request):
         
         
         #Convertir el tipo String a un int para q se conpare con el otro int=p["categoria"]
-        if categoria=="-1":
-          print(MostrarPlato.objects)
+        if restaurante == "-1" and categoria== "-1":
           ListaPedidosQuerySet = MostrarPlato.objects.filter(restaurante_id=restaurante)
           for c in ListaPedidosQuerySet:
             ListaPedidos.append({
@@ -144,7 +143,7 @@ def obtenerPlatos_10(request):
                       
             })
         else:
-            print("categoria", categoria, " restaurante" + restaurante)
+            
             ListaPedidosQuerySet = MostrarPlato.objects.filter(categoría_id=categoria, restaurante_id=restaurante) 
             for c in ListaPedidosQuerySet:
                 ListaPedidos.append({
