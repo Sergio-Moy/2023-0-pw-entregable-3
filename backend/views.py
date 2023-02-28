@@ -119,13 +119,16 @@ def obtenerPlatos_10(request):
             strError = json.dumps(dictError)
             return HttpResponse(strError)
         
+        ListaPedidosQuerySet = MostrarPlato.objects.all()
+        
         ListaPedidos = []
         
+        
         #Convertir el tipo String a un int para q se conpare con el otro int=p["categoria"]
-        if restaurante == "-1" and categoria== "-1":
-            ListaPedidosQuerySet = MostrarPlato.objects.all()
-            for c in ListaPedidosQuerySet:
-                ListaPedidos.append({
+        if categoria=="-1":
+          ListaPedidosQuerySet = MostrarPlato.objects.filter(restaurante__nombre=restaurante)
+          for c in ListaPedidosQuerySet:
+            ListaPedidos.append({
                       "id":c.id,
                       "producto":c.producto,
                       "precio":str(c.precio),
@@ -135,13 +138,13 @@ def obtenerPlatos_10(request):
                       "categoria":{
                         "nombre":c.categoría.nombre
                       },
-                      "imagen":c.imagen      
-                })
-          
+                      "imagen":c.imagen
+                      
+            })
         else:
-            
-            ListaPedidosQuerySet = MostrarPlato.objects.filter(categoría_id=categoria, restaurante_id=restaurante) 
+            ListaPedidosQuerySet = MostrarPlato.objects.filter(categoría__nombre=categoria,restaurante__nombre=restaurante)
             for c in ListaPedidosQuerySet:
+                
                 ListaPedidos.append({
                       "id":c.id,
                       "producto":c.producto,
