@@ -174,6 +174,72 @@ def obtenerPlatos_10(request):
         return HttpResponse(strError)
 
 @csrf_exempt
+def obtenerPlatos_1000(request):
+    if request.method == "GET":
+        categoria = request.GET.get("categoria")
+        restaurante = request.GET.get("restaurante")
+        if restaurante == None and categoria==None:
+            dictError = {
+                "error": "Debe enviar una categoria y restaurante como query paremeter."
+            }
+            strError = json.dumps(dictError)
+            return HttpResponse(strError)
+        
+        ListaPedidosQuerySet = MostrarPlato.objects.all()
+        
+        ListaPedidos = []
+        
+        
+        #Convertir el tipo String a un int para q se conpare con el otro int=p["categoria"]
+        if categoria=="-1":
+          ListaPedidosQuerySet = MostrarPlato.objects.filter(restaurante__id=restaurante)
+          for c in ListaPedidosQuerySet:
+            ListaPedidos.append({
+                      "id":c.id,
+                      "producto":c.producto,
+                      "precio":str(c.precio),
+                      "restaurante": {
+                        "nombre":c.restaurante.nombre
+                      },
+                      "categoria":{
+                        "nombre":c.categoría.nombre
+                      },
+                      "imagen":c.imagen
+                      
+            })
+        else:
+            ListaPedidosQuerySet = MostrarPlato.objects.filter(categoría__id=categoria,restaurante__id=restaurante)
+            for c in ListaPedidosQuerySet:
+                
+                ListaPedidos.append({
+                      "id":c.id,
+                      "producto":c.producto,
+                      "precio":str(c.precio),
+                      "restaurante": {
+                        "nombre":c.restaurante.nombre
+                      },
+                      "categoria":{
+                        "nombre":c.categoría.nombre
+                      },
+                      "imagen":c.imagen
+                      
+                })
+        
+        # TODO: Consultas a base de datos
+        dictResponse = {
+            "error": "",
+            "platos_10": list(ListaPedidos)
+        }
+        strResponse = json.dumps(dictResponse)
+        return HttpResponse(strResponse)
+    else:
+        dictError = {
+            "error": "Tipo de peticion no existe"
+        }
+        strError = json.dumps(dictError)
+        return HttpResponse(strError)
+
+@csrf_exempt
 def ObtenerCategorias_10(request):
     if request.method=="GET":
         pedidosFiltradas = []
@@ -577,7 +643,7 @@ def ObtenerPedido_Registrar_7(request):
         elif Estado=="2":
             rptaE="En preparación"
         else:
-            rptaE="Entregado"
+            rptaE="Terminado"
         
 
         if Registrado=="1":
